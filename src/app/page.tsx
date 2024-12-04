@@ -1,8 +1,8 @@
+import HomePage from "@/components/pages/home-page/HomePage";
+
 const Home = () => {
   return (
-    <div>
-	    dick
-    </div>
+	  <HomePage/>
   );
 }
 
