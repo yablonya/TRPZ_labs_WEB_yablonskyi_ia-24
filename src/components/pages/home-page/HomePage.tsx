@@ -42,6 +42,7 @@ const mindMapsList: MindMapType[] = [
 const HomePage = () => {
 	const userContext = useContext(UserContext);
 	const [user, setUser] = useState<User | null>(null);
+	const [mindMaps, setMindMaps] = useState<MindMapType[] | null>(null);
 	const router = useRouter();
 	const handleLogoutClick = async (event: React.MouseEvent) => {
 		try {
@@ -85,9 +86,31 @@ const HomePage = () => {
 				console.error('Network error:', error);
 			}
 		}
+
+		const fetchUserMindMaps = async () => {
+			try {
+				const res = await fetch(`http://localhost:8080/api/mind-map/all`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					credentials: 'include',
+				});
+
+				if (res.ok) {
+					const mindMaps = await res.json();
+					setMindMaps(mindMaps);
+				} else {
+					console.log('Error fetching user mind maps');
+				}
+			} catch (error) {
+				console.error('Network error:', error);
+			}
+		}
 		
 		if (userContext?.user) {
 			fetchUser();
+			fetchUserMindMaps();
 		}
 	}, [userContext]);
 	
@@ -97,7 +120,7 @@ const HomePage = () => {
 				<h2>Hi, {user?.name}</h2>
 				<button onClick={handleLogoutClick}>Logout</button>
 			</div>
-			<MindMapsList mindMapsList={mindMapsList} />
+			<MindMapsList mindMapsList={mindMaps ?? []} />
 		</div>
 	);
 };
