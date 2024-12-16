@@ -7,37 +7,7 @@ import "./HomePage.scss"
 import {useRouter} from "next/navigation";
 import {UserContext} from "@/utils/hooks/useAuthentication";
 import {User} from "@/types/User";
-
-const mindMapsList: MindMapType[] = [
-	{
-		id: 1,
-		creatorId: 1,
-		name: "First Mind Map",
-		title: "My first mind map",
-		creationDate: "2024-12-04T17:28:20.016+00:00"
-	},
-	{
-		id: 2,
-		creatorId: 1,
-		name: "Second Mind Map",
-		title: "My second mind map",
-		creationDate: "2024-12-04T17:28:20.016+00:00"
-	},
-	{
-		id: 3,
-		creatorId: 1,
-		name: "Third Mind Map",
-		title: "My third mind map",
-		creationDate: "2024-12-04T17:28:20.016+00:00"
-	},
-	{
-		id: 4,
-		creatorId: 1,
-		name: "Fourth Mind Map",
-		title: "My fourth mind map",
-		creationDate: "2024-12-04T17:28:20.016+00:00"
-	}
-]
+import CreateMapDialog from "@/components/pages/home-page/components/create-map-dialog/CreateMapDialog";
 
 const HomePage = () => {
 	const userContext = useContext(UserContext);
@@ -117,10 +87,18 @@ const HomePage = () => {
 	return (
 		<div className="home-page">
 			<div className="header">
-				<h2>Hi, {user?.name}</h2>
+				<h1>Hi, {user?.name}</h1>
 				<button onClick={handleLogoutClick}>Logout</button>
 			</div>
-			<MindMapsList mindMapsList={mindMaps ?? []} />
+			{mindMaps ? (
+				<>
+					<h2 className="mind-maps-header">Your mind maps</h2>
+					<MindMapsList mindMapsList={mindMaps}/>
+				</>
+			) : (
+				<h2 className="no-mind-maps">You have no mind maps...</h2>
+			)}
+			<CreateMapDialog/>
 		</div>
 	);
 };

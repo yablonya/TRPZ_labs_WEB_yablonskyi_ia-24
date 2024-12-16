@@ -1,5 +1,3 @@
-import {MindMapType} from "@/types/MindMapType";
-
 export type NodeType = {
 	id: number;
 	mindMapId: number;

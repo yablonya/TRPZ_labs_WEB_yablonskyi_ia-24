@@ -10,7 +10,7 @@ interface MindMapsListProps {
 const MindMapsList: FC<MindMapsListProps> = ({ mindMapsList }) => {
 	return (
 		<div className="mind-maps-list">
-			{mindMapsList && mindMapsList.map((mindMap) => (
+			{mindMapsList.map((mindMap) => (
 				<MindMapCard mindMap={mindMap} key={mindMap.id} />
 			))}
 		</div>
