@@ -5,35 +5,13 @@ interface MapControlPanelProps {
 	mindMapId: number;
 	controlState: string;
 	setControlState: Dispatch<SetStateAction<string>>;
+	onAddNodeClick: () => void;
 }
 
-const MapControlPanel: FC<MapControlPanelProps> = ({mindMapId, controlState, setControlState}) => {
-	const controlPanelRef = useRef<HTMLDivElement>(null);
-	const [isNodeAdding, setIsNodeAdding] = useState<boolean>(false);
-
-	useEffect(() => {
-		if (isNodeAdding) {
-			setControlState("add-node");
-		} else {
-			setControlState("view");
-		}
-	}, [isNodeAdding]);
-	
+const MapControlPanel: FC<MapControlPanelProps> = ({ onAddNodeClick }) => {
 	return (
-		<div 
-			ref={controlPanelRef}
-			className="panel-container"
-		>
-			<button
-				style={
-					(((controlState === "add-node") && isNodeAdding) ? {
-						backgroundColor: "#808080"
-					} : {})
-				}
-				onClick={() => setIsNodeAdding(!isNodeAdding)}
-			>
-				Add node
-			</button>
+		<div className="panel-container">
+			<button onClick={onAddNodeClick}>Add node</button>
 			<button>Comment</button>
 		</div>
 	);

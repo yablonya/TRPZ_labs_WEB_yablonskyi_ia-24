@@ -1,7 +1,8 @@
 import React, {FC, useState} from 'react';
 import { NodeType } from "@/types/NodeType";
 import "./NodeComponent.scss"
-import {NewNodeType} from "@/types/NewNodeType";
+import { useDrag, useDrop } from 'react-dnd';
+import loginPage from "@/components/pages/login-page/LoginPage";
 
 interface NodeComponentProps {
 	node: NodeType;
@@ -10,28 +11,33 @@ interface NodeComponentProps {
 const NodeComponent: FC<NodeComponentProps> = ({ node }) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const [content, setContent] = useState(node.content);
-
-	const handleDoubleClick = () => {
-		setIsEditing(true);
-	};
-
-	const handleBlur = () => {
-		setIsEditing(false);
-	};
-
+	
+	const [{ isDragging }, drag] = useDrag(() => ({
+		type: "node",
+		item: { id: node.id },
+		collect: (monitor) => ({
+			isDragging: monitor.isDragging(),
+		}),
+	}));
+	
+	const handleDoubleClick = () => setIsEditing(true);
+	const handleBlur = () => setIsEditing(false);
 	const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-		if (event.key === "Enter") {
-			setIsEditing(false);
-		}
+		if (event.key === "Enter") setIsEditing(false);
 	};
 
 	return (
 		<div
+			ref={(nodeEl) => {
+				drag(nodeEl);
+			}}
 			className="node-component"
 			style={{
-				left: node.xPosition,
-				top: node.yPosition,
+				left: node.xposition,
+				top: node.yposition,
 				position: "absolute",
+				opacity: isDragging ? 0 : 1,
+				cursor: "move",
 			}}
 			onDoubleClick={handleDoubleClick}
 		>
