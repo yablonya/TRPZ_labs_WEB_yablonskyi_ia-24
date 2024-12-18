@@ -8,18 +8,18 @@
   bottom: 25px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #919191;
+  background-color: #fff;
+  box-shadow: 0 0 6px -1px gray;
   
   button {
     background: none;
     border: none;
     outline: none;
-    color: white;
     border-radius: 9999px;
-    padding: 10px;
+    padding: 10px 14px;
     
     &:hover {
-      background-color: #737373;
+      background-color: rgba(0, 0, 0, 0.08);
     }
   }
 }

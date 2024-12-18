@@ -1,46 +1,46 @@
-import React, {FC, useEffect, useRef, useState} from 'react';
+import React, {Dispatch, FC, SetStateAction, useRef} from 'react';
 import { NodeType } from "@/types/NodeType";
-import "./NodeContainer.scss"
 import NodeComponent from "@/components/common/node-component/NodeComponent";
-import {DndProvider, useDrop} from "react-dnd";
-import {HTML5Backend} from "react-dnd-html5-backend";
+import {useDrop} from "react-dnd";
+
+import "./NodeContainer.scss"
 
 interface NodesContainerProps {
 	nodes: NodeType[];
-	controlState: string;
+	setNodes: Dispatch<SetStateAction<NodeType[]>>;
 }
 
-const NodesContainer: FC<NodesContainerProps> = ({ nodes, controlState  }) => {
+const NodesContainer: FC<NodesContainerProps> = ({ nodes, setNodes }) => {
 	const containerRef = useRef<HTMLDivElement | null>(null);
-	const [currentNodes, setCurrentNodes] = useState<NodeType[]>(nodes);
-	const [, drop] = useDrop(() => ({
+
+	const updateNodePosition = (id: number, x: number, y: number) => {
+		setNodes((prevNodes) =>
+			prevNodes.map((node) => (node.id === id ? { ...node, xposition: x, yposition: y } : node))
+		);
+	};
+
+	const [, drop] = useDrop({
 		accept: "node",
 		drop: (item: { id: number }, monitor) => {
 			const offset = monitor.getClientOffset();
-			if (offset) {
-				const newX = offset.x;
-				const newY = offset.y;
-				
-				setCurrentNodes((prevNodes) =>
-					prevNodes.map((node) =>
-						node.id === item.id
-							? { ...node, xposition: newX, yposition: newY }
-							: node
-					)
-				);
+			const bounds = containerRef.current?.getBoundingClientRect();
+			if (offset && bounds) {
+				updateNodePosition(item.id, offset.x - bounds.left, offset.y - bounds.top);
 			}
 		},
-	}));
-	
+	});
+
 	drop(containerRef);
 
 	return (
-		<div
-			ref={containerRef}
+		<div 
+			ref={containerRef} 
 			className="node-container"
 		>
-			{currentNodes && currentNodes.map((node, index) => (
-				<NodeComponent node={node} key={index + nodes.length}/>
+			{nodes.map((node) => (
+				<NodeComponent key={node.id} node={node} updateNodeContent={(id, content) =>
+					setNodes((prev) => prev.map((n) => (n.id === id ? { ...n, content } : n)))
+				} />
 			))}
 		</div>
 	);

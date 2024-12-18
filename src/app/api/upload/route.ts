@@ -17,13 +17,13 @@ export const config = {
 
 export const POST = async (req: NextRequest) => {
 	try {
-		const { data } = await req.json(); // Отримуємо тіло запиту з JSON
+		const { data } = await req.json();
 		if (!data) {
 			return NextResponse.json({ error: 'No file provided' }, { status: 400 });
 		}
 		
 		const uploadedResponse = await cloudinary.uploader.upload(data, {
-			public_id: 'cock',
+			public_id: data.public_id,
 		});
 		
 		return NextResponse.json({ url: uploadedResponse.secure_url });

@@ -1,20 +1,16 @@
-import React, {Dispatch, FC, SetStateAction, useEffect, useRef, useState} from 'react';
+import React, { FC } from 'react';
 import "./MapControlPanel.scss"
 
 interface MapControlPanelProps {
-	mindMapId: number;
-	controlState: string;
-	setControlState: Dispatch<SetStateAction<string>>;
-	onAddNodeClick: () => void;
+	onSave: () => void;
+	onAddNode: () => void;
 }
 
-const MapControlPanel: FC<MapControlPanelProps> = ({ onAddNodeClick }) => {
-	return (
-		<div className="panel-container">
-			<button onClick={onAddNodeClick}>Add node</button>
-			<button>Comment</button>
-		</div>
-	);
-};
+const MapControlPanel: FC<MapControlPanelProps> = ({ onSave, onAddNode }) => (
+	<div className="panel-container">
+		<button onClick={onAddNode}>Add Node</button>
+		<button onClick={onSave}>Save Map</button>
+	</div>
+);
 
 export default MapControlPanel;

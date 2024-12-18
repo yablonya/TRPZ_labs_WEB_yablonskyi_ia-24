@@ -1,0 +1,90 @@
+.add-node-form {
+  position: fixed;
+  right: 25px;
+  bottom: 25px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 0 6px -1px gray;
+  
+  h3 {
+    font-weight: 400;
+    text-align: center;
+  }
+
+  input:not([type="file"]) {
+    padding: 4px 10px;
+  }
+
+  button {
+    background: none;
+    border: 1px solid black;
+    border-radius: 6px;
+    outline: none;
+    padding: 4px 10px;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    &:active {
+      background: rgba(0, 0, 0, 0.1);
+    }
+  }
+  
+  .file-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    gap: 5px;
+    padding: 5px;
+    
+    .file-item {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      white-space: nowrap;
+      p {
+        max-width: 90%;
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 12px;
+      }
+      
+
+      button {
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 22px;
+        width: 22px;
+        flex-shrink: 0;
+      }
+    }
+
+    .file-limit-msg {
+      font-size: 14px;
+      color: red;
+      text-align: center;
+    }
+  }
+  
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    
+    button {
+      flex: 1;
+    }
+  }
+}
