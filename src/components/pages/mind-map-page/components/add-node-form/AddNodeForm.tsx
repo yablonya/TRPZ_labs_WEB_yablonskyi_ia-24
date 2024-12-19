@@ -12,7 +12,7 @@ const AddNodeForm: FC<AddNodeFormProps> = ({ mindMapId, onClose, onNodeAdded }) 
 	const [formState, setFormState] = useState({
 		content: '',
 		priority: 0,
-		category: '',
+		categories: [] as string[],
 		files: [] as File[],
 	});
 	const [loading, setLoading] = useState(false);
@@ -30,6 +30,16 @@ const AddNodeForm: FC<AddNodeFormProps> = ({ mindMapId, onClose, onNodeAdded }) 
 
 	const handleRemoveFile = (index: number) => {
 		updateFormField('files', formState.files.filter((_, i) => i !== index));
+	};
+
+	const handleAddCategory = (category: string) => {
+		if (category && !formState.categories.includes(category)) {
+			updateFormField('categories', [...formState.categories, category]);
+		}
+	};
+
+	const handleRemoveCategory = (index: number) => {
+		updateFormField('categories', formState.categories.filter((_, i) => i !== index));
 	};
 
 	const uploadFiles = async (): Promise<UploadedFile[]> => {
@@ -54,17 +64,22 @@ const AddNodeForm: FC<AddNodeFormProps> = ({ mindMapId, onClose, onNodeAdded }) 
 
 	const handleSubmit = async () => {
 		setLoading(true);
+		
 		try {
 			const uploadedFiles = await uploadFiles();
 			const payload = {
 				mindMapId,
 				content: formState.content,
-				priority: formState.priority,
-				category: formState.category,
 				xPosition: window.innerWidth / 2,
 				yPosition: window.innerHeight / 2,
+				nodeIcons: [
+					{ type: 'priority', content: formState.priority.toString() },
+					...formState.categories.map((category) => ({ type: 'category', content: category })),
+				],
 				nodeFiles: uploadedFiles,
 			};
+			
+			console.log(payload)
 
 			const res = await fetch('http://localhost:8080/api/mind-map/add-node', {
 				method: 'POST',
@@ -103,12 +118,28 @@ const AddNodeForm: FC<AddNodeFormProps> = ({ mindMapId, onClose, onNodeAdded }) 
 				value={formState.priority || ''}
 				onChange={(e) => updateFormField('priority', Number(e.target.value) || 0)}
 			/>
-			<input
-				type="text"
-				placeholder="Category (optional)"
-				value={formState.category}
-				onChange={(e) => updateFormField('category', e.target.value)}
-			/>
+			<div className="category-input-container">
+				<input
+					type="text"
+					placeholder="Add category"
+					onKeyDown={(e) => {
+						if (e.key === 'Enter') {
+							handleAddCategory((e.target as HTMLInputElement).value);
+							(e.target as HTMLInputElement).value = '';
+						}
+					}}
+				/>
+				<div className="category-list">
+					{formState.categories.map((category, index) => (
+						<div key={index} className="category-item">
+							<p>{category}</p>
+							<button onClick={() => handleRemoveCategory(index)} className="remove-category-btn">
+								&times;
+							</button>
+						</div>
+					))}
+				</div>
+			</div>
 			<div className="file-upload-container">
 				<input
 					type="file"
@@ -140,7 +171,5 @@ const AddNodeForm: FC<AddNodeFormProps> = ({ mindMapId, onClose, onNodeAdded }) 
 		</div>
 	);
 };
-
-
 
 export default AddNodeForm;
