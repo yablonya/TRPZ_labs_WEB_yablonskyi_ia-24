@@ -1,25 +1,18 @@
 import React, {FC, useEffect, useRef, useState} from 'react';
 import { NodeType } from "@/types/NodeType";
 import { useDrag } from 'react-dnd';
+import {NewNodeIcon, NodeFile, NodeIcon } from '@/types';
+import {
+	addFileToNode,
+	createNodeIcon,
+	getNodeFiles,
+	getNodeIcons,
+	deleteNodeFile,
+	deleteNodeIcon,
+    uploadFile
+} from '@/services/nodeService';
+
 import "./NodeComponent.scss"
-import {UploadedFile} from "@/types/UploadedFile";
-
-interface NodeFile {
-	id: number;
-	url: string;
-	type: string;
-}
-
-interface NodeIcon {
-	id: number;
-	type: string;
-	content: string;
-}
-
-interface NewNodeIcon {
-	type: string;
-	content: string;
-}
 
 interface NodeComponentProps {
 	node: NodeType;
@@ -53,136 +46,71 @@ const NodeComponent: FC<NodeComponentProps> = ({
 	const [{ isDragging }, drag] = useDrag(() => ({
 		type: "node",
 		item: { id: node.id },
-		// canDrag: !handMode,
 		collect: (monitor) => ({ isDragging: monitor.isDragging() }),
 	}));
-	
-	const fetchFilesAndIcons = async () => {
-		try {
-			const filesRes = await fetch(`http://localhost:8080/api/mind-map/node/${node.id}/files`, {
-				method: "GET",
-				credentials: "include",
-			});
-			if (filesRes.ok) {
-				const filesData = await filesRes.json();
-				setFiles(filesData);
-			} else {
-				console.error("Failed to fetch files for node:", node.id);
-			}
 
-			const iconsRes = await fetch(`http://localhost:8080/api/mind-map/node/${node.id}/icons`, {
-				method: "GET",
-				credentials: "include",
-			});
-			if (iconsRes.ok) {
-				const iconsData = await iconsRes.json();
-				setIcons(iconsData);
-			} else {
-				console.error("Failed to fetch icons for node:", node.id);
-			}
+	const fetchNodeComponents = async () => {
+		try {
+			const filesData = await getNodeFiles(node.id);
+			setFiles(filesData);
+
+			const iconsData = await getNodeIcons(node.id);
+			setIcons(iconsData);
 		} catch (error) {
-			console.error("Error fetching data for node:", error);
+			console.error('Error fetching data for node:', error);
 		}
 	};
 
 	useEffect(() => {
-		fetchFilesAndIcons();
+		fetchNodeComponents();
 	}, [node.id]);
-
-	const uploadFile = async (): Promise<UploadedFile> => {
-		const reader = new FileReader();
-		reader.readAsDataURL(newFile!);
-		
-		return new Promise<UploadedFile>((resolve) => {
-			reader.onloadend = async () => {
-				const res = await fetch('/api/upload', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ data: reader.result }),
-				});
-				const { url } = await res.json();
-				resolve({ url, type: newFile!.type });
-			};
-		});
-	};
-
+	
 	const addIcon = async (icon: NewNodeIcon) => {
 		try {
-			const res = await fetch(`http://localhost:8080/api/mind-map/node/${node.id}/add-icon`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				credentials: "include",
-				body: JSON.stringify(icon),
-			});
-			if (res.ok) {
-				if (icon.type === "priority") {
-					setNewPriority("")
-				} else {
-					setNewCategory("")
-				}
-				fetchFilesAndIcons();
+			await createNodeIcon(node.id, icon);
+			
+			if (icon.type === 'priority') {
+				setNewPriority('');
 			} else {
-				console.error("Failed to add icon:", icon);
+				setNewCategory('');
 			}
+			fetchNodeComponents();
 		} catch (error) {
-			console.error("Error adding icon:", error);
+			console.error('Error adding icon:', error);
 		}
 	};
-
+	
 	const addFile = async () => {
-		let uploadedFile;
-		
-		if (newFile) {
-			uploadedFile = await uploadFile()
-		}
+		if (!newFile) return;
 		
 		try {
-			const res = await fetch(`http://localhost:8080/api/mind-map/node/${node.id}/add-file`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				credentials: "include",
-				body: JSON.stringify(uploadedFile),
-			});
-			if (res.ok) {
-				setNewFile(null)
-				fetchFilesAndIcons();
-			} else {
-				console.error("Failed to add file:", uploadedFile);
-			}
+			const uploadedFile = await uploadFile(newFile);
+			await addFileToNode(node.id, uploadedFile);
+
+			setNewFile(null);
+			fetchNodeComponents();
 		} catch (error) {
-			console.error("Error adding file:", error);
+			console.error('Error adding file:', error);
 		}
 	};
-
+	
 	const removeIcon = async (iconId: number) => {
 		try {
-			const res = await fetch(`http://localhost:8080/api/mind-map/node/${node.id}/remove-icon?iconId=${iconId}`, {
-				method: "POST",
-				credentials: "include",
-			});
-			if (res.ok) {
-				setIcons((prevIcons) => prevIcons.filter((icon) => icon.id !== iconId));
-			} else {
-				console.error("Failed to remove icon with id:", iconId);
-			}
+			await deleteNodeIcon(node.id, iconId);
+			
+			setIcons((prev) => prev.filter((icon) => icon.id !== iconId));
 		} catch (error) {
-			console.error("Error removing icon:", error);
+			console.error('Error removing icon:', error);
 		}
 	};
-
+	
 	const removeFile = async (fileId: number) => {
 		try {
-			const res = await fetch(`http://localhost:8080/api/mind-map/node/${node.id}/remove-file?fileId=${fileId}`, {
-				method: "POST",
-				credentials: "include",
-			});
-			if (res.ok) {
-				setFiles((prevFiles) => prevFiles.filter((file) => file.id !== fileId));
-			} else {
-				console.error("Failed to remove file with id:", fileId);
-			}
+			await deleteNodeFile(node.id, fileId);
+
+			setFiles((prev) => prev.filter((file) => file.id !== fileId));
 		} catch (error) {
-			console.error("Error removing file:", error);
+			console.error('Error removing file:', error);
 		}
 	};
 
@@ -341,14 +269,11 @@ const NodeComponent: FC<NodeComponentProps> = ({
 					Add
 				</button>
 			</div>
-			{/* КНОПКА ВИДАЛЕННЯ ВУЗЛА */}
 			<button onClick={() => onDeleteNode?.(node.id)} className="delete-node-btn">
 				Delete Node
 			</button>
-
-			{/* КНОПКИ СТВОРЕННЯ/ПІДТВЕРДЖЕННЯ КОНЕКШНІВ */}
+			
 			{connectionOriginNodeId === null && (
-				// Якщо ще не обрано "початковий" вузол - показати кнопку "Create Connection"
 				<button
 					onClick={() => setConnectionOriginNodeId?.(node.id)}
 					className="create-connection-btn"
@@ -358,18 +283,15 @@ const NodeComponent: FC<NodeComponentProps> = ({
 			)}
 
 			{connectionOriginNodeId === node.id && (
-				// Якщо цей вузол є "початковим" для з'єднання - підказка, що треба обрати інший вузол
 				<div className="create-connection-info">
 					Click another node to connect
 				</div>
 			)}
 
 			{connectionOriginNodeId !== null && connectionOriginNodeId !== node.id && (
-				// Якщо обрано інший вузол як початковий, а це - інший вузол
 				<button
 					onClick={() => {
 						onCreateConnection?.(connectionOriginNodeId!, node.id);
-						// Після підтвердження скидаємо стан
 						setConnectionOriginNodeId?.(null);
 					}}
 					className="connect-node-btn"

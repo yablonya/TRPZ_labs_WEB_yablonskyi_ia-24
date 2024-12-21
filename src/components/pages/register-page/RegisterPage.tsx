@@ -3,8 +3,10 @@
 import React, {useContext, useEffect} from 'react';
 import Link from "next/link";
 import {useRouter} from "next/navigation";
-import "./Register.scss"
 import { UserContext } from '@/utils/hooks/useAuthentication';
+import { registerUser } from '@/services/authService';
+
+import "./Register.scss"
 
 const RegisterPage = () => {
 	const userContext = useContext(UserContext);
@@ -26,7 +28,7 @@ const RegisterPage = () => {
 
 	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault();
-		
+
 		try {
 			for (let field of Object.values(newUser)) {
 				if (field === "") {
@@ -34,28 +36,18 @@ const RegisterPage = () => {
 					return;
 				}
 			}
-			const res = await fetch('http://localhost:8080/api/register', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				credentials: 'include',
-				body: JSON.stringify(newUser)
+			
+			await registerUser(newUser);
+			
+			userContext?.login(+document.cookie.split("=")[1])
+			setNewUser({
+				name: "",
+				email: "",
+				password: "",
 			});
-
-			if (res.ok) {
-				userContext?.login(+document.cookie.split("=")[1])
-				setNewUser({
-					name: "",
-					email: "",
-					password: "",
-				});
-				router.push('/');
-			} else {
-				console.log('Registration error');
-			}
+			router.push('/');
 		} catch (error) {
-			console.error('Network error:', error);
+			console.error('Registration error:', error);
 		}
 	};
 	

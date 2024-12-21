@@ -2,9 +2,11 @@
 
 import React, {useContext} from 'react';
 import Link from "next/link";
-import "./Login.scss"
 import {useRouter} from "next/navigation";
 import {UserContext} from "@/utils/hooks/useAuthentication";
+import { loginUser } from '@/services/authService';
+
+import "./Login.scss"
 
 const LoginPage = () => {
 	const userContext = useContext(UserContext);
@@ -33,27 +35,17 @@ const LoginPage = () => {
 					return;
 				}
 			}
-			const res = await fetch('http://localhost:8080/api/login', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				credentials: 'include',
-				body: JSON.stringify(loginData)
+			
+			await loginUser(loginData);
+			
+			userContext?.login(+document.cookie.split("=")[1])
+			setLoginData({
+				email: "",
+				password: "",
 			});
-
-			if (res.ok) {
-				userContext?.login(+document.cookie.split("=")[1])
-				setLoginData({
-					email: "",
-					password: "",
-				});
-				router.push('/');
-			} else {
-				console.log('Registration error');
-			}
+			router.push('/');
 		} catch (error) {
-			console.error('Network error:', error);
+			console.error('Login error:', error);
 		}
 	};
 	

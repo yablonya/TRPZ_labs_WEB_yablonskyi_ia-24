@@ -1,8 +1,8 @@
-export type UserType = {
+export interface UserType {
 	id: number;
 	name: string;
-	password: string;
 	email: string;
+	password: string;
 	accountStatus: string;
 	creationDate: string;
 }

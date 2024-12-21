@@ -6,78 +6,46 @@ import MindMapsList from "@/components/common/mind-maps-list/MindMapsList";
 import "./HomePage.scss"
 import {useRouter} from "next/navigation";
 import {UserContext} from "@/utils/hooks/useAuthentication";
-import {User} from "@/types/User";
 import CreateMapDialog from "@/components/pages/home-page/components/create-map-dialog/CreateMapDialog";
+import {getUserData, logoutUser} from '@/services/authService';
+import { getAllMindMaps } from '@/services/mindMapService';
+import {UserType} from "@/types";
 
 const HomePage = () => {
 	const userContext = useContext(UserContext);
-	const [user, setUser] = useState<User | null>(null);
+	const [user, setUser] = useState<UserType | null>(null);
 	const [mindMaps, setMindMaps] = useState<MindMapType[] | null>(null);
 	const router = useRouter();
-	const handleLogoutClick = async (event: React.MouseEvent) => {
-		try {
-			const res = await fetch('http://localhost:8080/api/logout', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				credentials: 'include',
-			});
 
-			if (res.ok) {
-				router.push('/');
-				console.log("User log out successfully");
-			} else {
-				console.log('Registration error');
-			}
+	const handleLogoutClick = async () => {
+		try {
+			await logoutUser();
+			router.push('/');
+			console.log("User log out successfully");
 		} catch (error) {
-			console.error('Network error:', error);
+			console.error('Logout error:', error);
 		}
 	};
-
+	
 	useEffect(() => {
 		const fetchUser = async () => {
 			try {
-				const res = await fetch(`http://localhost:8080/api/user/${userContext?.user}`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					credentials: 'include',
-				});
-
-				if (res.ok) {
-					const user = await res.json();
-					setUser(user);
-				} else {
-					console.log('Error fetching user');
-				}
+				const userData = await getUserData(userContext?.user!);
+				setUser(userData);
 			} catch (error) {
-				console.error('Network error:', error);
+				console.error('Error fetching user:', error);
 			}
-		}
+		};
 
 		const fetchUserMindMaps = async () => {
 			try {
-				const res = await fetch(`http://localhost:8080/api/mind-map/all`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					credentials: 'include',
-				});
-
-				if (res.ok) {
-					const mindMaps = await res.json();
-					setMindMaps(mindMaps);
-				} else {
-					console.log('Error fetching user mind maps');
-				}
+				const mindMapsData = await getAllMindMaps();
+				setMindMaps(mindMapsData);
 			} catch (error) {
-				console.error('Network error:', error);
+				console.error('Error fetching user mind maps:', error);
 			}
-		}
-		
+		};
+
 		if (userContext?.user) {
 			fetchUser();
 			fetchUserMindMaps();

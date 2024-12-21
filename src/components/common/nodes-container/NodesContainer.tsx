@@ -2,16 +2,10 @@ import React, {Dispatch, FC, SetStateAction, useEffect, useRef, useState} from '
 import { NodeType } from "@/types/NodeType";
 import NodeComponent from "@/components/common/node-component/NodeComponent";
 import {useDrop} from "react-dnd";
-
-import "./NodeContainer.scss"
 import {ConnectionType} from "@/types/ConnectionType";
 
-interface IRect {
-	x: number;
-	y: number;
-	width: number;
-	height: number;
-}
+import "./NodeContainer.scss"
+import { IRect } from '@/types';
 
 interface NodesContainerProps {
 	nodes: NodeType[];
@@ -24,6 +18,7 @@ interface NodesContainerProps {
 	onCreateConnection?: (fromNodeId: number, toNodeId: number) => void;
 	handMode: boolean;
 	outlineMode: boolean;
+	containerSize: number;
 }
 
 const NodesContainer: FC<NodesContainerProps> = ({ 
@@ -36,18 +31,21 @@ const NodesContainer: FC<NodesContainerProps> = ({
 	onCreateConnection,
 	connectionOriginNodeId,
 	handMode,
-	outlineMode
+	outlineMode,
+	containerSize
 }) => {
 	const containerRef = useRef<HTMLDivElement | null>(null);
-
-	// Стан для панорамування (зсув, "рух по карті")
+	
 	const [isPanning, setIsPanning] = useState(false);
 	const [startX, setStartX] = useState(0);
 	const [startY, setStartY] = useState(0);
 	const [panX, setPanX] = useState(0);
 	const [panY, setPanY] = useState(0);
-
-	const containerSize = 100000;
+	const [isDrawing, setIsDrawing] = useState(false);
+	const [rect, setRect] = useState<IRect | null>(null);
+	const [startDrawX, setStartDrawX] = useState(0);
+	const [startDrawY, setStartDrawY] = useState(0);
+	const [currentRect, setCurrentRect] = useState<IRect | null>(null);
 
 	useEffect(() => {
 		const centerX = -(containerSize / 2) + window.innerWidth / 2;
@@ -56,94 +54,6 @@ const NodesContainer: FC<NodesContainerProps> = ({
 		setPanX(centerX);
 		setPanY(centerY);
 	}, []);
-
-	// Стан для "режиму обведення"
-	const [isDrawing, setIsDrawing] = useState(false);
-	const [rect, setRect] = useState<IRect | null>(null);
-
-	// Координати початку малювання
-	const [startDrawX, setStartDrawX] = useState(0);
-	const [startDrawY, setStartDrawY] = useState(0);
-
-	// Поточний "тимчасовий" прямокутник, поки ми тягнемо мишу
-	const [currentRect, setCurrentRect] = useState<IRect | null>(null);
-
-	// 1) Коли користувач натискає мишею на контейнері
-	// Функція, що викликається при onMouseDown на контейнері
-	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-		// Якщо включено handMode — панорамування, як і раніше
-		if (handMode) {
-			setIsPanning(true);
-			setStartX(e.clientX - panX);
-			setStartY(e.clientY - panY);
-			return;
-		}
-
-		// Якщо увімкнено outlineMode — починаємо малювати прямокутник
-		if (outlineMode) {
-			setIsDrawing(true);
-			// Запам'ятовуємо початкові координати для обведення
-			setStartDrawX(e.clientX);
-			setStartDrawY(e.clientY);
-			setCurrentRect({
-				x: e.clientX,
-				y: e.clientY,
-				width: 0,
-				height: 0,
-			});
-			return;
-		}
-
-		// Якщо жоден режим не увімкнено — нічого особливого не робимо
-	};
-
-// Функція, що викликається при onMouseMove
-	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-		// Якщо перетягуємо мапу:
-		if (isPanning && handMode) {
-			setPanX(e.clientX - startX);
-			setPanY(e.clientY - startY);
-			return;
-		}
-
-		// Якщо малюємо прямокутник:
-		if (isDrawing && outlineMode && currentRect) {
-			const newWidth = e.clientX - startDrawX;
-			const newHeight = e.clientY - startDrawY;
-
-			setCurrentRect({
-				...currentRect,
-				x: Math.min(startDrawX, e.clientX),
-				y: Math.min(startDrawY, e.clientY),
-				width: Math.abs(newWidth),
-				height: Math.abs(newHeight),
-			});
-		}
-	};
-
-// Функція, що викликається при onMouseUp
-	const handleMouseUp = () => {
-		// Завершуємо панорамування:
-		if (isPanning) {
-			setIsPanning(false);
-		}
-
-		// Завершуємо малювання прямокутника:
-		if (isDrawing && outlineMode && currentRect) {
-			// Додаємо поточний прямокутник у масив "готових"
-			setRect(currentRect);
-
-			// Скидаємо тимчасовий прямокутник:
-			setCurrentRect(null);
-			setIsDrawing(false);
-		}
-	};
-
-	const updateNodePosition = (id: number, x: number, y: number) => {
-		setNodes((prevNodes) =>
-			prevNodes.map((node) => (node.id === id ? { ...node, xposition: x, yposition: y } : node))
-		);
-	};
 
 	const [, drop] = useDrop({
 		accept: "node",
@@ -155,24 +65,92 @@ const NodesContainer: FC<NodesContainerProps> = ({
 			}
 		},
 	});
+	
+	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+		if (handMode) {
+			setIsPanning(true);
+			setStartX(e.clientX - panX);
+			setStartY(e.clientY - panY);
+			return;
+		}
+		
+		if (outlineMode) {
+			const rect = containerRef.current?.getBoundingClientRect();
+			if (!rect) return;
+			
+			setIsDrawing(true);
+			setStartDrawX(e.clientX - rect.left);
+			setStartDrawY(e.clientY - rect.top);
+			setCurrentRect({
+				x: e.clientX - rect.left,
+				y: e.clientY - rect.top,
+				width: 0,
+				height: 0,
+			});
+			return;
+		}
+		
+		
+	};
+
+	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+		if (isPanning && handMode) {
+			setPanX(e.clientX - startX);
+			setPanY(e.clientY - startY);
+			return;
+		}
+
+		if (isDrawing && outlineMode && currentRect) {
+			const rect = containerRef.current?.getBoundingClientRect();
+			if (!rect) return;
+			
+			const offsetX = e.clientX - rect.left;
+			const offsetY = e.clientY - rect.top;
+
+			const newWidth = offsetX - startDrawX;
+			const newHeight = offsetY - startDrawY;
+
+			setCurrentRect({
+				...currentRect,
+				x: Math.min(startDrawX, offsetX),
+				y: Math.min(startDrawY, offsetY),
+				width: Math.abs(newWidth),
+				height: Math.abs(newHeight),
+			});
+		}
+	};
+	
+	const handleMouseUp = () => {
+		if (isPanning) {
+			setIsPanning(false);
+		}
+		
+		if (isDrawing && outlineMode && currentRect) {
+			setRect(currentRect);
+			setCurrentRect(null);
+			setIsDrawing(false);
+		}
+	};
+
+	const updateNodePosition = (id: number, x: number, y: number) => {
+		setNodes((prevNodes) =>
+			prevNodes.map((node) => (node.id === id ? { ...node, xposition: x, yposition: y } : node))
+		);
+	};
+	
+	const updateNodeContent = (id: number, content: string) =>
+		setNodes((prev) => prev.map((n) => (n.id === id ? {...n, content} : n)))
 
 	drop(containerRef);
 
 	return (
-		<div 
-			ref={containerRef} 
+		<div
+			ref={containerRef}
 			className="node-container"
 			onMouseDown={handleMouseDown}
 			onMouseMove={handleMouseMove}
 			onMouseUp={handleMouseUp}
-			// Стилі для зсуву контенту:
 			style={{
-				// Приклади стилів, щоб панорамування працювало:
-				width: '100%',
-				height: '100%',
-				overflow: 'hidden',
-				position: 'relative',
-				// Зсуваємо через transform
 				transform: `translate(${panX}px, ${panY}px)`,
 				cursor: handMode ? 'grab' : 'default',
 			}}
@@ -192,12 +170,11 @@ const NodesContainer: FC<NodesContainerProps> = ({
 								stroke="black"
 								strokeWidth={2}
 							/>
-							{/* Невеликий текст або кнопка в середині лінії, щоб видалити її */}
 							<text
 								x={midX}
 								y={midY}
 								fill="red"
-								style={{ cursor: 'pointer', fontWeight: 'bold' }}
+								style={{cursor: 'pointer', fontWeight: 'bold'}}
 								onClick={() => onDeleteConnection(connection.id)}
 							>
 								×
@@ -209,48 +186,31 @@ const NodesContainer: FC<NodesContainerProps> = ({
 
 			{rect && (
 				<div
+					className="created-selection"
 					style={{
-						position: 'absolute',
-						border: '2px dashed black',
 						left: rect.x,
 						top: rect.y,
 						width: rect.width,
 						height: rect.height,
-						// pointerEvents: 'none' зазвичай для того, щоб не заважати вузлам,
-						// але нам треба, щоб кнопка всередині приймала кліки:
-						// Тож залишимо pointerEvents: 'auto'
-						pointerEvents: 'auto',
 					}}
 				>
-					{/* Кнопка для видалення (хрестик) у правому верхньому куті */}
 					<button
 						onClick={() => setRect(null)}
-						style={{
-							position: 'absolute',
-							top: 0,
-							right: 0,
-							backgroundColor: 'red',
-							color: 'white',
-							border: 'none',
-							cursor: 'pointer',
-						}}
+						className="remove-selection-btn"
 					>
-						×
+						&times;
 					</button>
 				</div>
 			)}
 
-			{/* Відображаємо поточний "тимчасовий" прямокутник (якщо є) */}
 			{currentRect && (
 				<div
+					className="current-selection"
 					style={{
-						position: 'absolute',
-						border: '1px solid black',
 						left: currentRect.x,
 						top: currentRect.y,
 						width: currentRect.width,
 						height: currentRect.height,
-						pointerEvents: 'none',
 					}}
 				/>
 			)}
@@ -259,9 +219,7 @@ const NodesContainer: FC<NodesContainerProps> = ({
 				<NodeComponent
 					key={node.id}
 					node={node}
-					updateNodeContent={(id, content) =>
-						setNodes((prev) => prev.map((n) => (n.id === id ? {...n, content} : n)))
-					}
+					updateNodeContent={(id, content) => updateNodeContent(id, content)}
 					onDeleteNode={onDeleteNode}
 					connectionOriginNodeId={connectionOriginNodeId}
 					setConnectionOriginNodeId={setConnectionOriginNodeId}

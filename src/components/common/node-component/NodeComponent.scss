@@ -13,6 +13,7 @@
     width: 100%;
     
     input {
+      width: 100%;
       border: none;
       background: none;
       border-bottom: 1px solid black;
@@ -79,6 +80,7 @@
   }
 
   .categories-container {
+    width: 100%;
     display: flex;
     flex-wrap: wrap;
     gap: 2px;
@@ -112,8 +114,8 @@
 }
 
 .file-preview {
-  max-width: 100px;
-  max-height: 100px;
+  max-width: 200px;
+  max-height: 200px;
   object-fit: cover;
   margin: 4px;
   border: 1px solid #ccc;

@@ -1,13 +1,42 @@
 .node-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   position: relative;
-  width: 100000px;
-  height: 100000px;
   
   .connections-layer {
+    overflow: visible;
     position: absolute;
     top: 0;
     right: 0;
     left: 0;
     bottom: 0;
+  }
+  
+  .created-selection {
+    position: absolute;
+    border: 2px dashed black;
+    pointer-events: auto;
+  }
+
+  .current-selection {
+    position: absolute;
+    border: 1px solid black;
+    pointer-events: auto;
+  }
+  
+  .remove-selection-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: red;
+    font-size: 1vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
   }
 }
