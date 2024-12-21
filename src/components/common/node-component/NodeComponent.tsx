@@ -29,6 +29,7 @@ interface NodeComponentProps {
 	setConnectionOriginNodeId?: (id: number | null) => void;
 	onCreateConnection?: (fromNodeId: number, toNodeId: number) => void;
 	handMode: boolean;
+	outlineMode: boolean;
 }
 
 const NodeComponent: FC<NodeComponentProps> = ({ 
@@ -39,6 +40,7 @@ const NodeComponent: FC<NodeComponentProps> = ({
 	connectionOriginNodeId,
 	onCreateConnection,
 	handMode,
+	outlineMode
 }) => {
 	const [icons, setIcons] = useState<NodeIcon[]>([]);
 	const [files, setFiles] = useState<NodeFile[]>([]);
@@ -54,8 +56,7 @@ const NodeComponent: FC<NodeComponentProps> = ({
 		// canDrag: !handMode,
 		collect: (monitor) => ({ isDragging: monitor.isDragging() }),
 	}));
-
-	console.log(handMode)
+	
 	const fetchFilesAndIcons = async () => {
 		try {
 			const filesRes = await fetch(`http://localhost:8080/api/mind-map/node/${node.id}/files`, {
@@ -203,7 +204,7 @@ const NodeComponent: FC<NodeComponentProps> = ({
 
 	return (
 		<div
-			ref={handMode ? null : (nodeEl) => {
+			ref={handMode || outlineMode ? null : (nodeEl) => {
 				drag(nodeEl);
 			}}
 			className="node-component"

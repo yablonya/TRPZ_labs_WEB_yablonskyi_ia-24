@@ -1,4 +1,4 @@
-import React, {Dispatch, FC, SetStateAction, useRef, useState} from 'react';
+import React, {Dispatch, FC, SetStateAction, useEffect, useRef, useState} from 'react';
 import { NodeType } from "@/types/NodeType";
 import NodeComponent from "@/components/common/node-component/NodeComponent";
 import {useDrop} from "react-dnd";
@@ -6,16 +6,24 @@ import {useDrop} from "react-dnd";
 import "./NodeContainer.scss"
 import {ConnectionType} from "@/types/ConnectionType";
 
+interface IRect {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}
+
 interface NodesContainerProps {
 	nodes: NodeType[];
 	connections: ConnectionType[];
-	handMode: boolean;
 	setNodes: Dispatch<SetStateAction<NodeType[]>>;
 	onDeleteConnection: (connectionId: number) => void;
 	onDeleteNode?: (nodeId: number) => void;
 	connectionOriginNodeId?: number | null;
 	setConnectionOriginNodeId?: (id: number | null) => void;
 	onCreateConnection?: (fromNodeId: number, toNodeId: number) => void;
+	handMode: boolean;
+	outlineMode: boolean;
 }
 
 const NodesContainer: FC<NodesContainerProps> = ({ 
@@ -27,7 +35,8 @@ const NodesContainer: FC<NodesContainerProps> = ({
 	setConnectionOriginNodeId,
 	onCreateConnection,
 	connectionOriginNodeId,
-	handMode
+	handMode,
+	outlineMode
 }) => {
 	const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -38,29 +47,96 @@ const NodesContainer: FC<NodesContainerProps> = ({
 	const [panX, setPanX] = useState(0);
 	const [panY, setPanY] = useState(0);
 
+	const containerSize = 100000;
+
+	useEffect(() => {
+		const centerX = -(containerSize / 2) + window.innerWidth / 2;
+		const centerY = -(containerSize / 2) + window.innerHeight / 2;
+
+		setPanX(centerX);
+		setPanY(centerY);
+	}, []);
+
+	// Стан для "режиму обведення"
+	const [isDrawing, setIsDrawing] = useState(false);
+	const [rect, setRect] = useState<IRect | null>(null);
+
+	// Координати початку малювання
+	const [startDrawX, setStartDrawX] = useState(0);
+	const [startDrawY, setStartDrawY] = useState(0);
+
+	// Поточний "тимчасовий" прямокутник, поки ми тягнемо мишу
+	const [currentRect, setCurrentRect] = useState<IRect | null>(null);
+
 	// 1) Коли користувач натискає мишею на контейнері
+	// Функція, що викликається при onMouseDown на контейнері
 	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-		// Якщо handMode ввімкнено, розпочинаємо "рух"
+		// Якщо включено handMode — панорамування, як і раніше
 		if (handMode) {
 			setIsPanning(true);
-			// Запам'ятовуємо, де саме натиснули (беремо клієнтські координати)
 			setStartX(e.clientX - panX);
 			setStartY(e.clientY - panY);
+			return;
 		}
+
+		// Якщо увімкнено outlineMode — починаємо малювати прямокутник
+		if (outlineMode) {
+			setIsDrawing(true);
+			// Запам'ятовуємо початкові координати для обведення
+			setStartDrawX(e.clientX);
+			setStartDrawY(e.clientY);
+			setCurrentRect({
+				x: e.clientX,
+				y: e.clientY,
+				width: 0,
+				height: 0,
+			});
+			return;
+		}
+
+		// Якщо жоден режим не увімкнено — нічого особливого не робимо
 	};
 
-	// 2) Коли рухаємо мишею (і якщо isPanning = true), зсуваємо контейнер
+// Функція, що викликається при onMouseMove
 	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+		// Якщо перетягуємо мапу:
 		if (isPanning && handMode) {
-			// Обчислюємо нові panX та panY, щоб рухати весь контейнер
 			setPanX(e.clientX - startX);
 			setPanY(e.clientY - startY);
+			return;
+		}
+
+		// Якщо малюємо прямокутник:
+		if (isDrawing && outlineMode && currentRect) {
+			const newWidth = e.clientX - startDrawX;
+			const newHeight = e.clientY - startDrawY;
+
+			setCurrentRect({
+				...currentRect,
+				x: Math.min(startDrawX, e.clientX),
+				y: Math.min(startDrawY, e.clientY),
+				width: Math.abs(newWidth),
+				height: Math.abs(newHeight),
+			});
 		}
 	};
 
-	// 3) При відпусканні кнопки миші припиняємо панорамування
+// Функція, що викликається при onMouseUp
 	const handleMouseUp = () => {
-		setIsPanning(false);
+		// Завершуємо панорамування:
+		if (isPanning) {
+			setIsPanning(false);
+		}
+
+		// Завершуємо малювання прямокутника:
+		if (isDrawing && outlineMode && currentRect) {
+			// Додаємо поточний прямокутник у масив "готових"
+			setRect(currentRect);
+
+			// Скидаємо тимчасовий прямокутник:
+			setCurrentRect(null);
+			setIsDrawing(false);
+		}
 	};
 
 	const updateNodePosition = (id: number, x: number, y: number) => {
@@ -130,19 +206,68 @@ const NodesContainer: FC<NodesContainerProps> = ({
 					);
 				})}
 			</svg>
-			
+
+			{rect && (
+				<div
+					style={{
+						position: 'absolute',
+						border: '2px dashed black',
+						left: rect.x,
+						top: rect.y,
+						width: rect.width,
+						height: rect.height,
+						// pointerEvents: 'none' зазвичай для того, щоб не заважати вузлам,
+						// але нам треба, щоб кнопка всередині приймала кліки:
+						// Тож залишимо pointerEvents: 'auto'
+						pointerEvents: 'auto',
+					}}
+				>
+					{/* Кнопка для видалення (хрестик) у правому верхньому куті */}
+					<button
+						onClick={() => setRect(null)}
+						style={{
+							position: 'absolute',
+							top: 0,
+							right: 0,
+							backgroundColor: 'red',
+							color: 'white',
+							border: 'none',
+							cursor: 'pointer',
+						}}
+					>
+						×
+					</button>
+				</div>
+			)}
+
+			{/* Відображаємо поточний "тимчасовий" прямокутник (якщо є) */}
+			{currentRect && (
+				<div
+					style={{
+						position: 'absolute',
+						border: '1px solid black',
+						left: currentRect.x,
+						top: currentRect.y,
+						width: currentRect.width,
+						height: currentRect.height,
+						pointerEvents: 'none',
+					}}
+				/>
+			)}
+
 			{nodes.map((node) => (
 				<NodeComponent
 					key={node.id}
 					node={node}
 					updateNodeContent={(id, content) =>
-						setNodes((prev) => prev.map((n) => (n.id === id ? { ...n, content } : n)))
+						setNodes((prev) => prev.map((n) => (n.id === id ? {...n, content} : n)))
 					}
 					onDeleteNode={onDeleteNode}
 					connectionOriginNodeId={connectionOriginNodeId}
 					setConnectionOriginNodeId={setConnectionOriginNodeId}
 					onCreateConnection={onCreateConnection}
 					handMode={handMode}
+					outlineMode={outlineMode}
 				/>
 			))}
 		</div>

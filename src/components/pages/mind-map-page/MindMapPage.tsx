@@ -23,6 +23,7 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 	const [showNodeForm, setShowNodeForm] = useState(false);
 	const [connectionOriginNodeId, setConnectionOriginNodeId] = useState<number | null>(null);
 	const [handMode, setHandMode] = useState(false);
+	const [outlineMode, setOutlineMode] = useState(false);
 
 	const fetchMindMapNodes = async () => {
 		try {
@@ -160,6 +161,7 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 					nodes={currentNodes}
 					connections={connections}
 					handMode={handMode}
+					outlineMode={outlineMode}
 					setNodes={(updatedNodes) => {
 						const updatedArray = typeof updatedNodes === "function" ? updatedNodes(currentNodes) : updatedNodes;
 						setCurrentNodes(updatedArray);
@@ -176,6 +178,8 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 					onAddNode={() => setShowNodeForm(true)}
 					handMode={handMode}
 					toggleHandMode={() => setHandMode(!handMode)}
+					outlineMode={outlineMode}
+					toggleOutlineMode={() => setOutlineMode(!outlineMode)}
 				/>
 				{showNodeForm &&
           <AddNodeForm
