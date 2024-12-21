@@ -10,12 +10,6 @@ interface NodeFile {
 	type: string;
 }
 
-interface NewNodeFile {
-	id: number;
-	url: string;
-	type: string;
-}
-
 interface NodeIcon {
 	id: number;
 	type: string;
@@ -30,9 +24,22 @@ interface NewNodeIcon {
 interface NodeComponentProps {
 	node: NodeType;
 	updateNodeContent: (id: number, content: string) => void;
+	onDeleteNode?: (nodeId: number) => void;
+	connectionOriginNodeId?: number | null;
+	setConnectionOriginNodeId?: (id: number | null) => void;
+	onCreateConnection?: (fromNodeId: number, toNodeId: number) => void;
+	handMode: boolean;
 }
 
-const NodeComponent: FC<NodeComponentProps> = ({ node, updateNodeContent }) => {
+const NodeComponent: FC<NodeComponentProps> = ({ 
+	node,
+	updateNodeContent,
+	onDeleteNode,
+	setConnectionOriginNodeId,
+	connectionOriginNodeId,
+	onCreateConnection,
+	handMode,
+}) => {
 	const [icons, setIcons] = useState<NodeIcon[]>([]);
 	const [files, setFiles] = useState<NodeFile[]>([]);
 	const [newPriority, setNewPriority] = useState<string>("");
@@ -44,9 +51,11 @@ const NodeComponent: FC<NodeComponentProps> = ({ node, updateNodeContent }) => {
 	const [{ isDragging }, drag] = useDrag(() => ({
 		type: "node",
 		item: { id: node.id },
+		// canDrag: !handMode,
 		collect: (monitor) => ({ isDragging: monitor.isDragging() }),
 	}));
 
+	console.log(handMode)
 	const fetchFilesAndIcons = async () => {
 		try {
 			const filesRes = await fetch(`http://localhost:8080/api/mind-map/node/${node.id}/files`, {
@@ -194,7 +203,7 @@ const NodeComponent: FC<NodeComponentProps> = ({ node, updateNodeContent }) => {
 
 	return (
 		<div
-			ref={(nodeEl) => {
+			ref={handMode ? null : (nodeEl) => {
 				drag(nodeEl);
 			}}
 			className="node-component"
@@ -202,7 +211,6 @@ const NodeComponent: FC<NodeComponentProps> = ({ node, updateNodeContent }) => {
 				left: `${node.xposition}px`,
 				top: `${node.yposition}px`,
 				position: "absolute",
-				opacity: isDragging ? 0 : 1,
 				cursor: "move",
 			}}
 		>
@@ -332,6 +340,42 @@ const NodeComponent: FC<NodeComponentProps> = ({ node, updateNodeContent }) => {
 					Add
 				</button>
 			</div>
+			{/* КНОПКА ВИДАЛЕННЯ ВУЗЛА */}
+			<button onClick={() => onDeleteNode?.(node.id)} className="delete-node-btn">
+				Delete Node
+			</button>
+
+			{/* КНОПКИ СТВОРЕННЯ/ПІДТВЕРДЖЕННЯ КОНЕКШНІВ */}
+			{connectionOriginNodeId === null && (
+				// Якщо ще не обрано "початковий" вузол - показати кнопку "Create Connection"
+				<button
+					onClick={() => setConnectionOriginNodeId?.(node.id)}
+					className="create-connection-btn"
+				>
+					Create Connection
+				</button>
+			)}
+
+			{connectionOriginNodeId === node.id && (
+				// Якщо цей вузол є "початковим" для з'єднання - підказка, що треба обрати інший вузол
+				<div className="create-connection-info">
+					Click another node to connect
+				</div>
+			)}
+
+			{connectionOriginNodeId !== null && connectionOriginNodeId !== node.id && (
+				// Якщо обрано інший вузол як початковий, а це - інший вузол
+				<button
+					onClick={() => {
+						onCreateConnection?.(connectionOriginNodeId!, node.id);
+						// Після підтвердження скидаємо стан
+						setConnectionOriginNodeId?.(null);
+					}}
+					className="connect-node-btn"
+				>
+					Connect
+				</button>
+			)}
 		</div>
 	);
 };

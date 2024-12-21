@@ -78,8 +78,6 @@ const AddNodeForm: FC<AddNodeFormProps> = ({ mindMapId, onClose, onNodeAdded }) 
 				],
 				nodeFiles: uploadedFiles,
 			};
-			
-			console.log(payload)
 
 			const res = await fetch('http://localhost:8080/api/mind-map/add-node', {
 				method: 'POST',
