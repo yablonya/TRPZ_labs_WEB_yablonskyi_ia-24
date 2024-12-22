@@ -87,7 +87,7 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 	const createConnection = async (fromNodeId: string, toNodeId: string) => {
 		try {
 			await addConnection(fromNodeId, toNodeId);
-			fetchConnections();
+			await fetchConnections();
 		} catch (error) {
 			console.error('Error adding connection:', error);
 		}
@@ -139,6 +139,7 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 						const updatedArray = typeof updatedNodes === "function" ? updatedNodes(nodes) : updatedNodes;
 						setNodes(updatedArray);
 						updateConnections(updatedArray);
+						updateNodes(mindMapId, updatedArray);
 					}}
 					onDeleteConnection={removeConnection}
 					onDeleteNode={removeNode}
