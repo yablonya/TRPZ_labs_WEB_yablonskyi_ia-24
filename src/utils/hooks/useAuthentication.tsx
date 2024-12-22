@@ -3,8 +3,8 @@
 import {ReactNode, createContext, useState, useEffect} from "react";
 
 export interface AuthenticationContext {
-	user: number | null;
-	login: (id: number) => void;
+	user: string | null;
+	login: (id: string) => void;
 	logout: () => void;
 }
 
@@ -15,13 +15,13 @@ interface UserProviderProps {
 }
 
 export const UserProvider = ({ children }: UserProviderProps) => {
-	const [user, setUser] = useState<number | null>(null);
+	const [user, setUser] = useState<string | null>(null);
 
 	useEffect(() => {
-		setUser(+document.cookie.split("=")[1]);
+		setUser(document.cookie.split("=")[1]);
 	}, []);
 
-	const login = (id: number) => {
+	const login = (id: string) => {
 		console.log(id)
 		setUser(id);
 	};

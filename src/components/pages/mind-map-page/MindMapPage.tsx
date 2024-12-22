@@ -1,7 +1,6 @@
 "use client";
 
 import React, {FC, useEffect, useState} from 'react';
-import { FullMindMapType } from "@/types/FullMindMapType";
 import NodesContainer from "@/components/common/nodes-container/NodesContainer";
 import MapControlPanel from './components/map-control-panel/MapControlPanel';
 import AddNodeForm from './components/add-node-form/AddNodeForm';
@@ -13,33 +12,42 @@ import {
 	addConnection,
 	deleteConnection,
 	getConnections,
-	getFullMindMap,
+	getMindMap, getNodes,
 	updateNodes
 } from '@/services/mindMapService';
 import { deleteNode } from '@/services/nodeService';
 
 import "./MindMapPage.scss";
+import {MindMapType} from "@/types";
 
 interface MindMapPageProps {
 	mindMapId: string;
 }
 
 const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
-	const [fullMindMap, setFullMindMap] = useState<FullMindMapType | null>(null);
-	const [currentNodes, setCurrentNodes] = useState<NodeType[]>([]);
+	const [mindMap, setMindMap] = useState<MindMapType | null>(null);
+	const [nodes, setNodes] = useState<NodeType[]>([]);
 	const [connections, setConnections] = useState<ConnectionType[]>([]);
 	const [showNodeForm, setShowNodeForm] = useState(false);
-	const [connectionOriginNodeId, setConnectionOriginNodeId] = useState<number | null>(null);
+	const [connectionOriginNodeId, setConnectionOriginNodeId] = useState<string | null>(null);
 	const [handMode, setHandMode] = useState(false);
 	const [outlineMode, setOutlineMode] = useState(false);
 
 	const containerSize = 100000;
 
-	const fetchMindMapNodes = async () => {
+	const fetchMindMap = async () => {
 		try {
-			const mindMap = await getFullMindMap(mindMapId);
-			setFullMindMap(mindMap);
-			setCurrentNodes(mindMap.nodes);
+			const mindMap = await getMindMap(mindMapId);
+			setMindMap(mindMap);
+		} catch (error) {
+			console.error("Network error:", error);
+		}
+	};
+
+	const fetchNodes = async () => {
+		try {
+			const nodesData = await getNodes(mindMapId);
+			setNodes(nodesData);
 		} catch (error) {
 			console.error("Network error:", error);
 		}
@@ -54,10 +62,10 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 		}
 	};
 
-	const removeNode = async (nodeId: number) => {
+	const removeNode = async (nodeId: string) => {
 		try {
 			await deleteNode(nodeId);
-			setCurrentNodes((prev) => prev.filter((n) => n.id !== nodeId));
+			setNodes((prev) => prev.filter((n) => n.id !== nodeId));
 			setConnections((prev) =>
 				prev.filter(
 					(c) => c.fromNode.id !== nodeId && c.toNode.id !== nodeId
@@ -70,13 +78,13 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 
 	const saveChangedNodes = async () => {
 		try {
-			await updateNodes(mindMapId, currentNodes);
+			await updateNodes(mindMapId, nodes);
 		} catch (error) {
 			console.error("Error saving nodes:", error);
 		}
 	};
 
-	const createConnection = async (fromNodeId: number, toNodeId: number) => {
+	const createConnection = async (fromNodeId: string, toNodeId: string) => {
 		try {
 			await addConnection(fromNodeId, toNodeId);
 			fetchConnections();
@@ -85,7 +93,7 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 		}
 	};
 
-	const removeConnection = async (connectionId: number) => {
+	const removeConnection = async (connectionId: string) => {
 		try {
 			await deleteConnection(connectionId);
 			setConnections((prev) => prev.filter((c) => c.id !== connectionId));
@@ -110,25 +118,26 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 	};
 
 	useEffect(() => {
-		fetchMindMapNodes();
+		fetchMindMap();
+		fetchNodes();
 		fetchConnections();
 		const autoSaveInterval = setInterval(saveChangedNodes, 2 * 60 * 1000);
 
 		return () => clearInterval(autoSaveInterval);
 	}, [mindMapId]);
 
-	return fullMindMap && (
+	return mindMap && (
 		<DndProvider backend={HTML5Backend}>
 			<div className="mind-map-page">
-				<h2>{fullMindMap.mindMap.name}</h2>
+				<h2>{mindMap.name}</h2>
 				<NodesContainer
-					nodes={currentNodes}
+					nodes={nodes}
 					connections={connections}
 					handMode={handMode}
 					outlineMode={outlineMode}
 					setNodes={(updatedNodes) => {
-						const updatedArray = typeof updatedNodes === "function" ? updatedNodes(currentNodes) : updatedNodes;
-						setCurrentNodes(updatedArray);
+						const updatedArray = typeof updatedNodes === "function" ? updatedNodes(nodes) : updatedNodes;
+						setNodes(updatedArray);
 						updateConnections(updatedArray);
 					}}
 					onDeleteConnection={removeConnection}
@@ -148,10 +157,10 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 				/>
 				{showNodeForm &&
           <AddNodeForm
-            mindMapId={fullMindMap.mindMap.id}
+            mindMapId={mindMap.id}
             onClose={() => setShowNodeForm(false)}
             onNodeAdded={() => {
-	            fetchMindMapNodes();
+	            fetchNodes();
 	            fetchConnections();
             }}
             containerSize={containerSize}

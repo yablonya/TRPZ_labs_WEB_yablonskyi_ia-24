@@ -39,7 +39,7 @@ const RegisterPage = () => {
 			
 			await registerUser(newUser);
 			
-			userContext?.login(+document.cookie.split("=")[1])
+			userContext?.login(document.cookie.split("=")[1])
 			setNewUser({
 				name: "",
 				email: "",

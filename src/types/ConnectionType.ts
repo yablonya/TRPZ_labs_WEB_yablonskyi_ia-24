@@ -1,7 +1,7 @@
 import {NodeType} from "@/types/NodeType";
 
 export interface ConnectionType {
-	id: number;
+	id: string;
 	fromNode: NodeType;
 	toNode: NodeType;
 }

@@ -16,11 +16,11 @@ import "./NodeComponent.scss"
 
 interface NodeComponentProps {
 	node: NodeType;
-	updateNodeContent: (id: number, content: string) => void;
-	onDeleteNode?: (nodeId: number) => void;
-	connectionOriginNodeId?: number | null;
-	setConnectionOriginNodeId?: (id: number | null) => void;
-	onCreateConnection?: (fromNodeId: number, toNodeId: number) => void;
+	updateNodeContent: (id: string, content: string) => void;
+	onDeleteNode?: (nodeId: string) => void;
+	connectionOriginNodeId?: string | null;
+	setConnectionOriginNodeId?: (id: string | null) => void;
+	onCreateConnection?: (fromNodeId: string, toNodeId: string) => void;
 	handMode: boolean;
 	outlineMode: boolean;
 }
@@ -94,7 +94,7 @@ const NodeComponent: FC<NodeComponentProps> = ({
 		}
 	};
 	
-	const removeIcon = async (iconId: number) => {
+	const removeIcon = async (iconId: string) => {
 		try {
 			await deleteNodeIcon(node.id, iconId);
 			
@@ -104,7 +104,7 @@ const NodeComponent: FC<NodeComponentProps> = ({
 		}
 	};
 	
-	const removeFile = async (fileId: number) => {
+	const removeFile = async (fileId: string) => {
 		try {
 			await deleteNodeFile(node.id, fileId);
 

@@ -11,11 +11,11 @@ interface NodesContainerProps {
 	nodes: NodeType[];
 	connections: ConnectionType[];
 	setNodes: Dispatch<SetStateAction<NodeType[]>>;
-	onDeleteConnection: (connectionId: number) => void;
-	onDeleteNode?: (nodeId: number) => void;
-	connectionOriginNodeId?: number | null;
-	setConnectionOriginNodeId?: (id: number | null) => void;
-	onCreateConnection?: (fromNodeId: number, toNodeId: number) => void;
+	onDeleteConnection: (connectionId: string) => void;
+	onDeleteNode?: (nodeId: string) => void;
+	connectionOriginNodeId?: string | null;
+	setConnectionOriginNodeId?: (id: string | null) => void;
+	onCreateConnection?: (fromNodeId: string, toNodeId: string) => void;
 	handMode: boolean;
 	outlineMode: boolean;
 	containerSize: number;
@@ -57,7 +57,7 @@ const NodesContainer: FC<NodesContainerProps> = ({
 
 	const [, drop] = useDrop({
 		accept: "node",
-		drop: (item: { id: number }, monitor) => {
+		drop: (item: { id: string }, monitor) => {
 			const offset = monitor.getClientOffset();
 			const bounds = containerRef.current?.getBoundingClientRect();
 			if (offset && bounds) {
@@ -132,13 +132,13 @@ const NodesContainer: FC<NodesContainerProps> = ({
 		}
 	};
 
-	const updateNodePosition = (id: number, x: number, y: number) => {
+	const updateNodePosition = (id: string, x: number, y: number) => {
 		setNodes((prevNodes) =>
 			prevNodes.map((node) => (node.id === id ? { ...node, xposition: x, yposition: y } : node))
 		);
 	};
 	
-	const updateNodeContent = (id: number, content: string) =>
+	const updateNodeContent = (id: string, content: string) =>
 		setNodes((prev) => prev.map((n) => (n.id === id ? {...n, content} : n)))
 
 	drop(containerRef);

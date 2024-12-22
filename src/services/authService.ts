@@ -45,7 +45,7 @@ export async function logoutUser(): Promise<void> {
 	}
 }
 
-export async function getUserData(userId: number | string): Promise<UserType> {
+export async function getUserData(userId: string): Promise<UserType> {
 	const res = await fetch(`http://localhost:8080/api/user/${userId}`, {
 		method: 'GET',
 		headers: {

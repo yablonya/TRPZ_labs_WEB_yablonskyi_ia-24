@@ -1,5 +1,5 @@
 export type MindMapType = {
-	id: number;
+	id: string;
 	creatorId: number;
 	name: string;
 	creationDate: string;

@@ -4,7 +4,7 @@ import { createNode, uploadFile } from '@/services/nodeService';
 import "./AddNodeForm.scss"
 
 interface AddNodeFormProps {
-	mindMapId: number;
+	mindMapId: string;
 	onClose: () => void;
 	onNodeAdded: () => void;
 	containerSize: number;

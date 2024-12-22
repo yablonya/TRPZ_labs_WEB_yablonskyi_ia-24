@@ -1,6 +1,6 @@
 export type NodeType = {
-	id: number;
-	mindMapId: number;
+	id: string;
+	mindMapId: string;
 	content: string;
 	priority: number;
 	category: string;

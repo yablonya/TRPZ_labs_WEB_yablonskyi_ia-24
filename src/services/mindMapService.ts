@@ -1,4 +1,4 @@
-import {NodeType, ConnectionType, FullMindMapType, MindMapType} from "@/types";
+import {NodeType, ConnectionType, MindMapType} from "@/types";
 
 export async function getAllMindMaps(): Promise<MindMapType[]> {
 	const res = await fetch(`http://localhost:8080/api/mind-map/all`, {
@@ -13,7 +13,7 @@ export async function getAllMindMaps(): Promise<MindMapType[]> {
 	return res.json();
 }
 
-export async function getFullMindMap(mindMapId: string): Promise<FullMindMapType> {
+export async function getMindMap(mindMapId: string): Promise<MindMapType> {
 	const res = await fetch(`http://localhost:8080/api/mind-map/${mindMapId}`, {
 		method: "GET",
 		credentials: 'include'
@@ -23,6 +23,19 @@ export async function getFullMindMap(mindMapId: string): Promise<FullMindMapType
 		throw new Error("Error fetching mind map");
 	}
 	
+	return res.json();
+}
+
+export async function getNodes(mindMapId: string): Promise<NodeType[]> {
+	const res = await fetch(`http://localhost:8080/api/mind-map/${mindMapId}/nodes`, {
+		method: "GET",
+		credentials: 'include'
+	});
+
+	if (!res.ok) {
+		throw new Error("Error fetching nodes");
+	}
+
 	return res.json();
 }
 
@@ -39,7 +52,7 @@ export async function updateNodes(mindMapId: string, nodes: NodeType[]): Promise
 	}
 }
 
-export async function addConnection(fromNodeId: number, toNodeId: number): Promise<void> {
+export async function addConnection(fromNodeId: string, toNodeId: string): Promise<void> {
 	const params = new URLSearchParams({ fromNodeId: String(fromNodeId), toNodeId: String(toNodeId) });
 	const res = await fetch(`http://localhost:8080/api/mind-map/add-connection?${params.toString()}`, {
 		method: 'POST',
@@ -64,7 +77,7 @@ export async function getConnections(mindMapId: string): Promise<ConnectionType[
 	return res.json();
 }
 
-export async function deleteConnection(connectionId: number): Promise<void> {
+export async function deleteConnection(connectionId: string): Promise<void> {
 	const res = await fetch(`http://localhost:8080/api/mind-map/delete-connection?connectionId=${connectionId}`, {
 		method: 'DELETE',
 		credentials: 'include',

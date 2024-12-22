@@ -15,7 +15,7 @@ export async function createNode(payload: any): Promise<void> {
 	}
 }
 
-export async function deleteNode(nodeId: number): Promise<void> {
+export async function deleteNode(nodeId: string): Promise<void> {
 	const res = await fetch(`http://localhost:8080/api/mind-map/node/delete?nodeId=${nodeId}`, {
 		method: 'DELETE',
 		credentials: 'include',
@@ -26,7 +26,7 @@ export async function deleteNode(nodeId: number): Promise<void> {
 	}
 }
 
-export async function getNodeFiles(nodeId: number) {
+export async function getNodeFiles(nodeId: string) {
 	const res = await fetch(`${BASE_NODE_URL}/${nodeId}/files`, {
 		method: 'GET',
 		credentials: 'include',
@@ -39,7 +39,7 @@ export async function getNodeFiles(nodeId: number) {
 	return res.json();
 }
 
-export async function getNodeIcons(nodeId: number) {
+export async function getNodeIcons(nodeId: string) {
 	const res = await fetch(`${BASE_NODE_URL}/${nodeId}/icons`, {
 		method: 'GET',
 		credentials: 'include',
@@ -52,7 +52,7 @@ export async function getNodeIcons(nodeId: number) {
 	return res.json();
 }
 
-export async function createNodeIcon(nodeId: number, icon: NewNodeIcon) {
+export async function createNodeIcon(nodeId: string, icon: NewNodeIcon) {
 	const res = await fetch(`${BASE_NODE_URL}/${nodeId}/add-icon`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -65,7 +65,7 @@ export async function createNodeIcon(nodeId: number, icon: NewNodeIcon) {
 	}
 }
 
-export async function deleteNodeIcon(nodeId: number, iconId: number) {
+export async function deleteNodeIcon(nodeId: string, iconId: string) {
 	const res = await fetch(
 		`${BASE_NODE_URL}/${nodeId}/delete-icon?iconId=${iconId}`,
 		{
@@ -79,7 +79,7 @@ export async function deleteNodeIcon(nodeId: number, iconId: number) {
 	}
 }
 
-export async function addFileToNode(nodeId: number, uploadedFile: UploadedFile) {
+export async function addFileToNode(nodeId: string, uploadedFile: UploadedFile) {
 	const res = await fetch(`${BASE_NODE_URL}/${nodeId}/add-file`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -92,7 +92,7 @@ export async function addFileToNode(nodeId: number, uploadedFile: UploadedFile) 
 	}
 }
 
-export async function deleteNodeFile(nodeId: number, fileId: number) {
+export async function deleteNodeFile(nodeId: string, fileId: string) {
 	const res = await fetch(
 		`${BASE_NODE_URL}/${nodeId}/delete-file?fileId=${fileId}`,
 		{

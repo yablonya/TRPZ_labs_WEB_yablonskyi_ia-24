@@ -1,5 +1,5 @@
 export interface NodeFile {
-	id: number;
+	id: string;
 	url: string;
 	type: string;
 }

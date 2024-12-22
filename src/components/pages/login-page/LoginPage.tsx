@@ -38,7 +38,7 @@ const LoginPage = () => {
 			
 			await loginUser(loginData);
 			
-			userContext?.login(+document.cookie.split("=")[1])
+			userContext?.login(document.cookie.split("=")[1])
 			setLoginData({
 				email: "",
 				password: "",
