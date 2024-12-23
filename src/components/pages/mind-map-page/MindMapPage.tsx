@@ -2,8 +2,6 @@
 
 import React, {FC, useEffect, useState} from 'react';
 import NodesContainer from "@/components/common/nodes-container/NodesContainer";
-import MapControlPanel from './components/map-control-panel/MapControlPanel';
-import AddNodeForm from './components/add-node-form/AddNodeForm';
 import {HTML5Backend} from "react-dnd-html5-backend";
 import {DndProvider} from "react-dnd";
 import {NodeType} from "@/types/NodeType";
@@ -19,6 +17,8 @@ import { deleteNode } from '@/services/nodeService';
 
 import "./MindMapPage.scss";
 import {MindMapType} from "@/types";
+import MapControlPanel from '@/components/common/map-control-panel/MapControlPanel';
+import AddNodeForm from '@/components/common/add-node-form/AddNodeForm';
 
 interface MindMapPageProps {
 	mindMapId: string;
@@ -30,8 +30,7 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 	const [connections, setConnections] = useState<ConnectionType[]>([]);
 	const [showNodeForm, setShowNodeForm] = useState(false);
 	const [connectionOriginNodeId, setConnectionOriginNodeId] = useState<string | null>(null);
-	const [handMode, setHandMode] = useState(false);
-	const [outlineMode, setOutlineMode] = useState(false);
+	const [mode, setMode] = useState<"hand" | "outline" | null>(null);
 
 	const containerSize = 100000;
 
@@ -133,8 +132,6 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 				<NodesContainer
 					nodes={nodes}
 					connections={connections}
-					handMode={handMode}
-					outlineMode={outlineMode}
 					setNodes={(updatedNodes) => {
 						const updatedArray = typeof updatedNodes === "function" ? updatedNodes(nodes) : updatedNodes;
 						setNodes(updatedArray);
@@ -146,15 +143,16 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 					connectionOriginNodeId={connectionOriginNodeId}
 					setConnectionOriginNodeId={setConnectionOriginNodeId}
 					onCreateConnection={createConnection}
+					mode={mode}
 					containerSize={containerSize}
 				/>
 				<MapControlPanel
+					mode={mode}
+					toggleHandMode={() => setMode(mode === "hand" ? null : "hand")}
+					toggleOutlineMode={() => setMode(mode === "outline" ? null : "outline")}
 					onSave={saveChangedNodes}
 					onAddNode={() => setShowNodeForm(true)}
-					handMode={handMode}
-					toggleHandMode={() => setHandMode(!handMode)}
-					outlineMode={outlineMode}
-					toggleOutlineMode={() => setOutlineMode(!outlineMode)}
+					onHistory={() => undefined}
 				/>
 				{showNodeForm &&
           <AddNodeForm

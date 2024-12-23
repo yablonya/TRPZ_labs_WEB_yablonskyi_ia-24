@@ -10,20 +10,20 @@ cloudinary.config({
 export const config = {
 	api: {
 		bodyParser: {
-			sizeLimit: '20mb',
+			sizeLimit: '200mb',
 		},
 	},
 };
 
 export const POST = async (req: NextRequest) => {
 	try {
-		const { data } = await req.json();
+		const { name, data } = await req.json();
 		if (!data) {
 			return NextResponse.json({ error: 'No file provided' }, { status: 400 });
 		}
 		
 		const uploadedResponse = await cloudinary.uploader.upload(data, {
-			public_id: data.public_id,
+			public_id: name,
 		});
 		
 		return NextResponse.json({ url: uploadedResponse.secure_url });

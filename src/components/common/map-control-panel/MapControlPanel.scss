@@ -12,14 +12,26 @@
   box-shadow: 0 0 6px -1px gray;
   
   button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: none;
     border: none;
     outline: none;
     border-radius: 9999px;
-    padding: 10px 14px;
+    padding: 10px;
     
     &:hover {
       background-color: rgba(0, 0, 0, 0.08);
     }
+  }
+
+  .panel-divider {
+    height: 40px;
+    width: 2px;
+    border: none;
+    border-radius: 2px;
+    margin-inline: 10px;
+    background-color: rgba(0, 0, 0, 0.35);
   }
 }

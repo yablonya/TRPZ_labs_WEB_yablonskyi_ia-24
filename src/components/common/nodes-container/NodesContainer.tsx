@@ -16,8 +16,7 @@ interface NodesContainerProps {
 	connectionOriginNodeId?: string | null;
 	setConnectionOriginNodeId?: (id: string | null) => void;
 	onCreateConnection?: (fromNodeId: string, toNodeId: string) => void;
-	handMode: boolean;
-	outlineMode: boolean;
+	mode: "hand" | "outline" | null;
 	containerSize: number;
 }
 
@@ -30,8 +29,7 @@ const NodesContainer: FC<NodesContainerProps> = ({
 	setConnectionOriginNodeId,
 	onCreateConnection,
 	connectionOriginNodeId,
-	handMode,
-	outlineMode,
+	mode,
 	containerSize
 }) => {
 	const containerRef = useRef<HTMLDivElement | null>(null);
@@ -67,17 +65,15 @@ const NodesContainer: FC<NodesContainerProps> = ({
 	});
 	
 	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-		if (handMode) {
+		if (mode === "hand") {
 			setIsPanning(true);
 			setStartX(e.clientX - panX);
 			setStartY(e.clientY - panY);
 			return;
-		}
-		
-		if (outlineMode) {
+		} else if (mode === "outline") {
 			const rect = containerRef.current?.getBoundingClientRect();
 			if (!rect) return;
-			
+
 			setIsDrawing(true);
 			setStartDrawX(e.clientX - rect.left);
 			setStartDrawY(e.clientY - rect.top);
@@ -89,21 +85,17 @@ const NodesContainer: FC<NodesContainerProps> = ({
 			});
 			return;
 		}
-		
-		
 	};
 
 	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-		if (isPanning && handMode) {
+		if (isPanning && mode === "hand") {
 			setPanX(e.clientX - startX);
 			setPanY(e.clientY - startY);
 			return;
-		}
-
-		if (isDrawing && outlineMode && currentRect) {
+		} else if (isDrawing && mode === "outline" && currentRect) {
 			const rect = containerRef.current?.getBoundingClientRect();
 			if (!rect) return;
-			
+
 			const offsetX = e.clientX - rect.left;
 			const offsetY = e.clientY - rect.top;
 
@@ -125,7 +117,7 @@ const NodesContainer: FC<NodesContainerProps> = ({
 			setIsPanning(false);
 		}
 		
-		if (isDrawing && outlineMode && currentRect) {
+		if (isDrawing && mode === "outline" && currentRect) {
 			setRect(currentRect);
 			setCurrentRect(null);
 			setIsDrawing(false);
@@ -152,7 +144,7 @@ const NodesContainer: FC<NodesContainerProps> = ({
 			onMouseUp={handleMouseUp}
 			style={{
 				transform: `translate(${panX}px, ${panY}px)`,
-				cursor: handMode ? 'grab' : 'default',
+				cursor: mode === "hand" ? 'grab' : 'default',
 			}}
 		>
 			<svg className="connections-layer">
@@ -224,8 +216,7 @@ const NodesContainer: FC<NodesContainerProps> = ({
 					connectionOriginNodeId={connectionOriginNodeId}
 					setConnectionOriginNodeId={setConnectionOriginNodeId}
 					onCreateConnection={onCreateConnection}
-					handMode={handMode}
-					outlineMode={outlineMode}
+					mode={mode}
 				/>
 			))}
 		</div>

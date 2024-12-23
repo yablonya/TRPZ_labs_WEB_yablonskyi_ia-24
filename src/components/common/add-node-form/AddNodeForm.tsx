@@ -13,7 +13,7 @@ interface AddNodeFormProps {
 const AddNodeForm: FC<AddNodeFormProps> = ({ mindMapId, onClose, onNodeAdded, containerSize }) => {
 	const [formState, setFormState] = useState({
 		content: '',
-		priority: 0,
+		priority: '',
 		categories: [] as string[],
 		files: [] as File[],
 	});
@@ -57,20 +57,30 @@ const AddNodeForm: FC<AddNodeFormProps> = ({ mindMapId, onClose, onNodeAdded, co
 
 		try {
 			const uploadedFiles = await uploadFiles();
+
+			const nodeIcons = [];
 			
+			if (formState.priority !== "") {
+				nodeIcons.push({
+					type: "priority",
+					content: formState.priority.toString()
+				});
+			}
+
+			nodeIcons.push(
+				...formState.categories.map((category) => ({
+					type: "category",
+					content: category
+				}))
+			);
+
 			const payload = {
 				mindMapId,
 				content: formState.content,
-				xPosition: (containerSize / 2),
-				yPosition: (containerSize / 2),
-				nodeIcons: [
-					{ type: 'priority', content: formState.priority.toString() },
-					...formState.categories.map((category) => ({
-						type: 'category',
-						content: category
-					})),
-				],
-				nodeFiles: uploadedFiles,
+				xPosition: containerSize / 2,
+				yPosition: containerSize / 2,
+				nodeIcons,
+				nodeFiles: uploadedFiles
 			};
 			
 			await createNode(payload);
@@ -98,6 +108,7 @@ const AddNodeForm: FC<AddNodeFormProps> = ({ mindMapId, onClose, onNodeAdded, co
 				type="number"
 				placeholder="Priority (optional)"
 				value={formState.priority || ''}
+				min={1}
 				onChange={(e) => updateFormField('priority', Number(e.target.value) || 0)}
 			/>
 			<div className="category-input-container">
