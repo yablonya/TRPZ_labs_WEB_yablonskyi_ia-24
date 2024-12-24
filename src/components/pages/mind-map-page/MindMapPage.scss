@@ -23,6 +23,11 @@
     a {
       display: block;
       padding: 0 8px;
+
+      &:hover {
+        text-decoration: underline;
+        text-underline-offset: 5px;
+      };
     }
     
     div {

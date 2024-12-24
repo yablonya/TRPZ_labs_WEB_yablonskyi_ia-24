@@ -4,7 +4,7 @@ import React, {useContext} from 'react';
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 import {UserContext} from "@/utils/hooks/useAuthentication";
-import { loginUser } from '@/services/authService';
+import { loginUser } from '@/services/userService';
 
 import "./Login.scss"
 

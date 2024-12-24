@@ -16,13 +16,14 @@
     justify-content: space-between;
     gap: 20px;
     
-    button {
+    a {
       background: none;
       border: 1px solid black;
       border-radius: 6px;
       outline: none;
       padding: 8px 24px;
       font-size: 20px;
+      cursor: pointer;
       
       &:hover {
         background: rgba(0, 0, 0, 0.05);

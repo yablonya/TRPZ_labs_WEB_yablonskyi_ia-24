@@ -115,8 +115,8 @@ export async function uploadFile(file: File): Promise<UploadedFile> {
 				const res = await fetch('/api/upload', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ 
-						name: file.name.split(" ").join("-"),
+					body: JSON.stringify({
+						name: file.name,
 						data: reader.result,
 					}),
 				});
@@ -125,7 +125,7 @@ export async function uploadFile(file: File): Promise<UploadedFile> {
 					throw Error('Error uploading file');
 				}
 				const { url } = await res.json();
-				resolve({ url, type: file.type });
+				resolve({ url, type: file.type, name: file.name });
 			} catch (error) {
 				reject(error);
 			}

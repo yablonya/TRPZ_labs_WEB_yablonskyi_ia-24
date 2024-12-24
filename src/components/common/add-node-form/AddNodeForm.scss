@@ -33,30 +33,36 @@
     }
   }
 
-  .category-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    padding: 5px;
+  .category-input-container {
+    input {
+      width: 100%;
+    }
     
-    
-    .category-item {
+    .category-list {
       display: flex;
+      flex-wrap: wrap;
       gap: 5px;
+      padding: 5px;
 
-      p {
-        font-weight: 400;
-        font-size: 14px;
-      }
 
-      button {
-        padding: 0;
+      .category-item {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 18px;
-        width: 18px;
-        flex-shrink: 0;
+        gap: 5px;
+
+        p {
+          font-weight: 400;
+          font-size: 14px;
+        }
+
+        button {
+          padding: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 18px;
+          width: 18px;
+          flex-shrink: 0;
+        }
       }
     }
   }

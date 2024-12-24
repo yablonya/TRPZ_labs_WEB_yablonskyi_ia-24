@@ -57,6 +57,8 @@ const AddNodeForm: FC<AddNodeFormProps> = ({ mindMapId, onClose, onNodeAdded, co
 
 		try {
 			const uploadedFiles = await uploadFiles();
+			
+			console.log(uploadedFiles);
 
 			const nodeIcons = [];
 			
@@ -158,7 +160,7 @@ const AddNodeForm: FC<AddNodeFormProps> = ({ mindMapId, onClose, onNodeAdded, co
 					{formState.files.map((file, index) => (
 						<div key={index} className="file-item">
 							<p>
-								{file.name} ({file.type})
+								{file.name}
 							</p>
 							<button
 								onClick={() => handleRemoveFile(index)}

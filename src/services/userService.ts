@@ -17,6 +17,27 @@ export async function registerUser(newUser: RegisterData) {
 	return res;
 }
 
+export async function updateUser(user: UserType) {
+	const res = await fetch('http://localhost:8080/api/user/update', {
+		method: 'PUT',
+		credentials: 'include',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			name: user.name,
+			email: user.email,
+			password: user.password,
+		}),
+	});
+
+	if (!res.ok) {
+		throw new Error('Failed to update user');
+	}
+
+	return res.json();
+}
+
 export async function loginUser(loginData: LoginData) {
 	const res = await fetch('http://localhost:8080/api/login', {
 		method: 'POST',
@@ -42,6 +63,17 @@ export async function logoutUser(): Promise<void> {
 
 	if (!res.ok) {
 		throw new Error('Logout error');
+	}
+}
+
+export async function deleteUser(): Promise<void> {
+	const response = await fetch('http://localhost:8080/api/user/delete', {
+		method: 'DELETE',
+		credentials: 'include',
+	});
+
+	if (!response.ok) {
+		throw new Error('Failed to delete user');
 	}
 }
 

@@ -4,7 +4,7 @@ import React, {useContext, useEffect} from 'react';
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 import { UserContext } from '@/utils/hooks/useAuthentication';
-import { registerUser } from '@/services/authService';
+import { registerUser } from '@/services/userService';
 
 import "./Register.scss"
 

@@ -49,36 +49,36 @@ const PreviewNodeComponent: FC<PreviewNodeComponentProps> = ({
 				{node.content}
 			</div>
 
-			{files.map((file) => {
-				if (file.type.startsWith('image/')) {
-					return (
-						<div key={file.id} className="file-item">
-							<img src={file.url} alt="file" className="file-preview"/>
-						</div>
-					);
-				} else if (file.type.startsWith('video/')) {
-					return (
-						<div key={file.id} className="file-item">
-							<video
-								src={file.url}
-								className="file-preview"
-								autoPlay
-								controls
-							/>
-						</div>
-					);
-				} else {
-					return (
-						<div key={file.id} className="file-item">
-							<div className="file-box">
-								<a href={file.url} target="_blank" rel="noopener noreferrer">
-									{file.url.split('/').pop()}
-								</a>
-							</div>
-						</div>
-					);
-				}
-			})}
+			{files.length > 0 && (
+				<div className="files-container">
+					{files.map((file) => {
+						const isImage = file.type.startsWith("image/");
+						const isVideo = file.type.startsWith("video/");
+
+						return (
+							isImage ? (
+								<div key={file.id} className="file-item image-file">
+									<img src={file.url} alt="file" className="file-preview"/>
+								</div>
+							) : isVideo ? (
+								<div key={file.id} className="file-item image-file">
+									<video
+										src={file.url}
+										className="file-preview"
+										controls
+									/>
+								</div>
+							) : (
+								<div key={file.id} className="file-item other-file">
+									<a href={file.url} target="_blank" rel="noopener noreferrer">
+										{file.name}
+									</a>
+								</div>
+							)
+						)
+					})}
+				</div>
+			)}
 
 			{icons.some((icon) => icon.type === "category") && (
 				<div className="categories-container">

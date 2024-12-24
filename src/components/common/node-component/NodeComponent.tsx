@@ -149,6 +149,7 @@ const NodeComponent: FC<NodeComponentProps> = ({
 
 		try {
 			const uploadedFile = await uploadFile(file);
+			console.log(uploadedFile)
 			await addFileToNode(node.id, uploadedFile);
 			fetchNodeComponents();
 		} catch (error) {
@@ -236,9 +237,16 @@ const NodeComponent: FC<NodeComponentProps> = ({
 						onChange={(event) => setNewPriority(event.target.value)}
 					/>
 					<button type="button" onClick={() => setShowPriorityForm(false)}>
-						[X]
+						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
+							<path fill="none" stroke="black" strokeLinecap="round" strokeWidth="1.5" d="M20 20L4 4m16 0L4 20"/>
+						</svg>
 					</button>
-					<button type="submit">[OK]</button>
+					<button type="submit">
+						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16">
+							<path fill="none" stroke="black" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"
+							      d="m2.75 8.75l3.5 3.5l7-7.5"/>
+						</svg>
+					</button>
 				</form>
 			)}
 
@@ -264,27 +272,46 @@ const NodeComponent: FC<NodeComponentProps> = ({
 					{files.map((file) => {
 						const isImage = file.type.startsWith("image/");
 						const isVideo = file.type.startsWith("video/");
+						
 						return (
-							<div key={file.id} className="file-item">
-								{isImage ? (
-									<img src={file.url} alt="file" className="file-preview" />
-								) : isVideo ? (
+							isImage ? (
+								<div key={file.id} className="file-item image-file">
+									<img src={file.url} alt="file" className="file-preview"/>
+									<button onClick={() => removeFile(file.id)}>
+										<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
+											<path fill="none" stroke="black" strokeLinecap="round" strokeWidth="1.5"
+											      d="M20 20L4 4m16 0L4 20"/>
+										</svg>
+									</button>
+								</div>
+							) : isVideo ? (
+								<div key={file.id} className="file-item image-file">
 									<video
 										src={file.url}
 										className="file-preview"
-										autoPlay
 										controls
 									/>
-								) : (
-									<div className="file-box">
-										<a href={file.url} target="_blank" rel="noopener noreferrer">
-											{file.url.split("/").pop()}
-										</a>
-									</div>
-								)}
-								<button onClick={() => removeFile(file.id)}>&times;</button>
-							</div>
-						);
+									<button onClick={() => removeFile(file.id)}>
+										<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24">
+											<path fill="none" stroke="black" strokeLinecap="round" strokeWidth="1.5"
+											      d="M20 20L4 4m16 0L4 20"/>
+										</svg>
+									</button>
+								</div>
+							) : (
+								<div key={file.id} className="file-item other-file">
+									<a href={file.url} target="_blank" rel="noopener noreferrer">
+										{file.name}
+									</a>
+									<button onClick={() => removeFile(file.id)}>
+										<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24">
+											<path fill="none" stroke="black" strokeLinecap="round" strokeWidth="1.5"
+											      d="M20 20L4 4m16 0L4 20"/>
+										</svg>
+									</button>
+								</div>
+							)
+						)
 					})}
 				</div>
 			)}
@@ -293,9 +320,9 @@ const NodeComponent: FC<NodeComponentProps> = ({
 				type="file"
 				ref={fileInputRef}
 				onChange={handleFileChange}
-				style={{ display: "none" }}
+				style={{display: "none"}}
 			/>
-			
+
 			{icons.some((icon) => icon.type === "category") && (
 				<div className="categories-container">
 					{icons.map(
@@ -307,7 +334,10 @@ const NodeComponent: FC<NodeComponentProps> = ({
 										className="delete-icon-btn"
 										onClick={() => removeIcon(icon.id)}
 									>
-										&times;
+										<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
+											<path fill="none" stroke="black" strokeLinecap="round" strokeWidth="1.5"
+											      d="M20 20L4 4m16 0L4 20"/>
+										</svg>
 									</button>
 								</div>
 							)
@@ -324,12 +354,19 @@ const NodeComponent: FC<NodeComponentProps> = ({
 						onChange={(event) => setNewCategory(event.target.value)}
 					/>
 					<button type="button" onClick={() => setShowCategoryForm(false)}>
-						[X]
+						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
+							<path fill="none" stroke="black" strokeLinecap="round" strokeWidth="1.5" d="M20 20L4 4m16 0L4 20"/>
+						</svg>
 					</button>
-					<button type="submit">[OK]</button>
+					<button type="submit">
+						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16">
+							<path fill="none" stroke="black" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"
+							      d="m2.75 8.75l3.5 3.5l7-7.5"/>
+						</svg>
+					</button>
 				</form>
 			)}
-			
+
 			{connectionOriginNodeId === node.id && (
 				<button
 					className="connection-button"
