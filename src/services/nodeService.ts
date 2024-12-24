@@ -115,10 +115,11 @@ export async function uploadFile(file: File): Promise<UploadedFile> {
 				const res = await fetch('/api/upload', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ name: file.name.split(" ").join("-"), data: reader.result }),
+					body: JSON.stringify({ 
+						name: file.name.split(" ").join("-"),
+						data: reader.result,
+					}),
 				});
-
-				console.log(file)
 				
 				if (!res.ok) {
 					throw Error('Error uploading file');

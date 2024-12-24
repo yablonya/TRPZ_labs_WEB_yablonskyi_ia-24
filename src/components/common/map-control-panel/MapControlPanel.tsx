@@ -6,7 +6,7 @@ interface MapControlPanelProps {
 	toggleOutlineMode: () => void;
 	toggleHandMode: () => void;
 	onAddNode: () => void;
-	onSave: () => void;
+	onCreateSnapshot: () => void;
 	onHistory: () => void;
 }
 
@@ -15,7 +15,7 @@ const MapControlPanel: FC<MapControlPanelProps> = ({
 	toggleHandMode,
 	toggleOutlineMode,
 	onAddNode,
-	onSave,
+	onCreateSnapshot,
 	onHistory,
 }) => (
 	<div className="panel-container">
@@ -51,7 +51,7 @@ const MapControlPanel: FC<MapControlPanelProps> = ({
 				      d="M12.5 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v7.5M16 19h6m-3-3v6"/>
 			</svg>
 		</button>
-		<button title={"Save mind map snapshot"} onClick={onSave}>
+		<button title={"Save mind map snapshot"} onClick={onCreateSnapshot}>
 			<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
 				<path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"
 				      d="M9 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0m3-9v6m0 6v6"/>

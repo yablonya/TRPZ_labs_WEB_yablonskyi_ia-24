@@ -3,15 +3,68 @@
   overflow: hidden;
   height: 100vh;
   width: 100vw;
-  
-  h2 {
+
+  .sidebar-header {
     position: absolute;
     top: 0;
     left: 0;
     z-index: 100;
-    padding: 30px 50px;
+    padding: 15px 30px 15px 15px;
     background-color: white;
-    border-right: 1px solid black;
     border-bottom: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom-right-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 12px;
+    color: black;
+    
+    a {
+      display: block;
+      padding: 0 8px;
+    }
+    
+    div {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      
+      button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: none;
+        background: none;
+        padding: 4px;
+        border-radius: 4px;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        &:active {
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+      }
+
+      h2, input {
+        line-height: 24px;
+        font-size: 24px;
+        border: none;
+        background: none;
+        outline: none;
+      }
+    }
+  }
+  
+  .right-control-panel {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
 }

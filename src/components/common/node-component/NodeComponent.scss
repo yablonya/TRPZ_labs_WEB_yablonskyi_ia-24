@@ -1,6 +1,7 @@
 .node-component {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 6px;
   position: absolute;
   padding: 10px;
@@ -9,15 +10,15 @@
   background-color: #cfcfcf;
   font-size: 16px;
   transform: translate(-50% , -50%);
-  max-width: 500px;
+  min-width: 130px;
+  max-width: 1000px;
+  overflow-x: auto;
 
   .priority-container {
-    flex: 1;
     padding-right: 30px;
   }
   
   .add-icon-form {
-    flex: 1;
     margin-right: 30px;
     position: relative;
     border-bottom: 1px solid black;
@@ -61,6 +62,7 @@
     padding: 2px 4px;
     font-size: 12px;
     line-height: 12px;
+    white-space: nowrap;
     
     button {
       border: none;
@@ -136,15 +138,48 @@
       background: rgba(0, 0, 0, 0.1);
     }
   }
-}
+  
+  .files-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 
-.file-preview {
-  width: 25%;
-  height: auto;
-  object-fit: cover;
-  margin: 4px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+    .file-item {
+      position: relative;
+      width: 100%;
+      max-width: 200px;
+      height: fit-content;
+
+      .file-preview {
+        width: 100%;
+        height: auto;
+      }
+
+      p {
+        max-width: 90%;
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 12px;
+      }
+
+      button {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+      }
+    }
+  }
+  
+  .resize-trigger {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 10px;
+    height: 10px;
+    background-color: gray;
+    cursor: se-resize;
+  }
 }
 
 .file-box {
@@ -161,31 +196,4 @@
   color: #333;
   font-size: 0.9em;
   word-break: break-word;
-}
-
-.file-item {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  white-space: nowrap;
-  p {
-    max-width: 90%;
-    display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 12px;
-  }
-
-
-  button {
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    width: 22px;
-    flex-shrink: 0;
-  }
 }

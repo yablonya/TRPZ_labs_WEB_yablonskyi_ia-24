@@ -14,7 +14,7 @@ import {UserType} from "@/types";
 const HomePage = () => {
 	const userContext = useContext(UserContext);
 	const [user, setUser] = useState<UserType | null>(null);
-	const [mindMaps, setMindMaps] = useState<MindMapType[] | null>(null);
+	const [mindMaps, setMindMaps] = useState<MindMapType[]>([]);
 	const router = useRouter();
 
 	const handleLogoutClick = async () => {
@@ -26,26 +26,26 @@ const HomePage = () => {
 			console.error('Logout error:', error);
 		}
 	};
+
+	const fetchUser = async () => {
+		try {
+			const userData = await getUserData(userContext?.user!);
+			setUser(userData);
+		} catch (error) {
+			console.error('Error fetching user:', error);
+		}
+	};
+
+	const fetchUserMindMaps = async () => {
+		try {
+			const mindMapsData = await getAllMindMaps();
+			setMindMaps(mindMapsData);
+		} catch (error) {
+			console.error('Error fetching user mind maps:', error);
+		}
+	};
 	
 	useEffect(() => {
-		const fetchUser = async () => {
-			try {
-				const userData = await getUserData(userContext?.user!);
-				setUser(userData);
-			} catch (error) {
-				console.error('Error fetching user:', error);
-			}
-		};
-
-		const fetchUserMindMaps = async () => {
-			try {
-				const mindMapsData = await getAllMindMaps();
-				setMindMaps(mindMapsData);
-			} catch (error) {
-				console.error('Error fetching user mind maps:', error);
-			}
-		};
-
 		if (userContext?.user) {
 			fetchUser();
 			fetchUserMindMaps();
@@ -58,10 +58,12 @@ const HomePage = () => {
 				<h1>Hi, {user?.name}</h1>
 				<button onClick={handleLogoutClick}>Logout</button>
 			</div>
-			{mindMaps ? (
+			{mindMaps.length !== 0 ? (
 				<>
 					<h2 className="mind-maps-header">Your mind maps</h2>
-					<MindMapsList mindMapsList={mindMaps}/>
+					<MindMapsList 
+						mindMapsList={mindMaps}
+					/>
 				</>
 			) : (
 				<h2 className="no-mind-maps">You have no mind maps...</h2>

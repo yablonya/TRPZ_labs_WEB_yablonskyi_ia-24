@@ -1,0 +1,47 @@
+.mind-map-sidebar {
+  width: 300px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -300px;
+  background-color: white;
+  transition: all 0.2s ease;
+  border-right: 1px solid black;
+  padding: 120px 20px 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+  
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    a {
+      border-radius: 6px;
+      outline: none;
+      font-size: 20px;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.05);
+      }
+
+      &:active {
+        background: rgba(0, 0, 0, 0.1);
+      }
+    }
+    
+    .mind-map-link {
+      padding: 8px 14px;
+      flex: 1;
+    }
+
+    .delete-btn {
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}

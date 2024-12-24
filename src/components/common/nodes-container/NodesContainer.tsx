@@ -12,10 +12,10 @@ interface NodesContainerProps {
 	connections: ConnectionType[];
 	setNodes: Dispatch<SetStateAction<NodeType[]>>;
 	onDeleteConnection: (connectionId: string) => void;
-	onDeleteNode?: (nodeId: string) => void;
-	connectionOriginNodeId?: string | null;
-	setConnectionOriginNodeId?: (id: string | null) => void;
-	onCreateConnection?: (fromNodeId: string, toNodeId: string) => void;
+	onDeleteNode: (nodeId: string) => void;
+	connectionOriginNodeId: string | null;
+	setConnectionOriginNodeId: (id: string | null) => void;
+	onCreateConnection: (fromNodeId: string, toNodeId: string) => void;
 	mode: "hand" | "outline" | null;
 	containerSize: number;
 }

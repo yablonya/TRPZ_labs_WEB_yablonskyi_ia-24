@@ -11,7 +11,10 @@ const MindMapsList: FC<MindMapsListProps> = ({ mindMapsList }) => {
 	return (
 		<div className="mind-maps-list">
 			{mindMapsList.map((mindMap) => (
-				<MindMapCard mindMap={mindMap} key={mindMap.id} />
+				<MindMapCard 
+					key={mindMap.id}
+					mindMap={mindMap}
+				/>
 			))}
 		</div>
 	);

@@ -10,7 +10,7 @@ cloudinary.config({
 export const config = {
 	api: {
 		bodyParser: {
-			sizeLimit: '200mb',
+			sizeLimit: '100mb',
 		},
 	},
 };
@@ -24,6 +24,7 @@ export const POST = async (req: NextRequest) => {
 		
 		const uploadedResponse = await cloudinary.uploader.upload(data, {
 			public_id: name,
+			resource_type: "auto"
 		});
 		
 		return NextResponse.json({ url: uploadedResponse.secure_url });

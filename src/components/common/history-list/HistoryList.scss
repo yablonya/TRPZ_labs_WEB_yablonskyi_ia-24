@@ -1,0 +1,46 @@
+.history-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 0 6px -1px gray;
+
+  h3 {
+    font-weight: 400;
+    text-align: center;
+  }
+  
+  .snapshot-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    
+    .snapshot-item-controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    button {
+      border: none;
+      background: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      border-radius: 50%;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      &:active {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+}
