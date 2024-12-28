@@ -14,6 +14,7 @@ import {
 
 import "./NodeComponent.scss"
 import NodeOptionsDropdown from "@/components/common/node-options-dropdown/NodeOptionsDropdown";
+import FileComponent from "@/components/common/file-component/FileComponent";
 
 interface NodeComponentProps {
 	node: NodeType;
@@ -128,7 +129,7 @@ const NodeComponent: FC<NodeComponentProps> = ({
 			} else if (icon.type === "category") {
 				setNewCategory("");
 			}
-			fetchNodeComponents();
+			await fetchNodeComponents();
 		} catch (error) {
 			console.error("Error adding icon:", error);
 		}
@@ -149,9 +150,8 @@ const NodeComponent: FC<NodeComponentProps> = ({
 
 		try {
 			const uploadedFile = await uploadFile(file);
-			console.log(uploadedFile)
 			await addFileToNode(node.id, uploadedFile);
-			fetchNodeComponents();
+			await fetchNodeComponents();
 		} catch (error) {
 			console.error("Error adding file:", error);
 		} finally {
@@ -209,7 +209,7 @@ const NodeComponent: FC<NodeComponentProps> = ({
 												? "crimson"
 												: +icon.content < 5
 													? "goldenrod"
-													: +icon.content >= 5
+													: +icon.content < 10
 														? "forestgreen"
 														: "blue",
 									}}
@@ -269,50 +269,9 @@ const NodeComponent: FC<NodeComponentProps> = ({
 
 			{files.length > 0 && (
 				<div className="files-container">
-					{files.map((file) => {
-						const isImage = file.type.startsWith("image/");
-						const isVideo = file.type.startsWith("video/");
-						
-						return (
-							isImage ? (
-								<div key={file.id} className="file-item image-file">
-									<img src={file.url} alt="file" className="file-preview"/>
-									<button onClick={() => removeFile(file.id)}>
-										<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
-											<path fill="none" stroke="black" strokeLinecap="round" strokeWidth="1.5"
-											      d="M20 20L4 4m16 0L4 20"/>
-										</svg>
-									</button>
-								</div>
-							) : isVideo ? (
-								<div key={file.id} className="file-item image-file">
-									<video
-										src={file.url}
-										className="file-preview"
-										controls
-									/>
-									<button onClick={() => removeFile(file.id)}>
-										<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24">
-											<path fill="none" stroke="black" strokeLinecap="round" strokeWidth="1.5"
-											      d="M20 20L4 4m16 0L4 20"/>
-										</svg>
-									</button>
-								</div>
-							) : (
-								<div key={file.id} className="file-item other-file">
-									<a href={file.url} target="_blank" rel="noopener noreferrer">
-										{file.name}
-									</a>
-									<button onClick={() => removeFile(file.id)}>
-										<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24">
-											<path fill="none" stroke="black" strokeLinecap="round" strokeWidth="1.5"
-											      d="M20 20L4 4m16 0L4 20"/>
-										</svg>
-									</button>
-								</div>
-							)
-						)
-					})}
+					{files.map((file) => (
+						<FileComponent key={file.id} file={file} onRemoveFile={removeFile} />
+					))}
 				</div>
 			)}
 

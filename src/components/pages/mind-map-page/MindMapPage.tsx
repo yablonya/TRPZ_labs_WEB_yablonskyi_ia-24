@@ -8,7 +8,8 @@ import {NodeType} from "@/types/NodeType";
 import {ConnectionType} from "@/types/ConnectionType";
 import {
 	addConnection,
-	deleteConnection, deleteMindMap, getAllMindMaps,
+	deleteConnection,
+	getAllMindMaps,
 	getConnections,
 	getMindMap,
 	getNodes,
@@ -41,7 +42,7 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 	const [showNodeForm, setShowNodeForm] = useState(false);
 	const [showHistory, setShowHistory] = useState(false);
 	const [connectionOriginNodeId, setConnectionOriginNodeId] = useState<string | null>(null);
-	const [hoverSnapshot, setHoverSnapshot] = useState<FullMindMapType | null>(null);
+	const [toggleSnapshot, setToggleSnapshot] = useState<FullMindMapType | null>(null);
 	const [showSidebar, setShowSidebar] = useState<boolean>(false);
 	const [mode, setMode] = useState<"hand" | "outline" | null>(null);
 
@@ -59,7 +60,8 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 		if (mindMap && localTitle.trim() !== mindMap.name.trim()) {
 			try {
 				await renameMindMap(mindMap.id, localTitle.trim());
-				setMindMap({ ...mindMap, name: localTitle.trim() });
+				fetchMindMap();
+				fetchUserMindMaps();
 			} catch (error) {
 				console.error("Error renaming mind map:", error);
 			}
@@ -202,7 +204,7 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 						)}
 					</div>
 				</div>
-				{!hoverSnapshot && (
+				{!toggleSnapshot && (
 					<NodesContainer
 						nodes={nodes}
 						connections={connections}
@@ -221,12 +223,12 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 						containerSize={containerSize}
 					/>
 				)}
-				{hoverSnapshot && (
+				{toggleSnapshot && (
 					<PreviewNodesContainer
-						nodes={hoverSnapshot.nodes}
-						connections={hoverSnapshot.connections}
-						icons={hoverSnapshot.icons}
-						files={hoverSnapshot.files}
+						nodes={toggleSnapshot.nodes}
+						connections={toggleSnapshot.connections}
+						icons={toggleSnapshot.icons}
+						files={toggleSnapshot.files}
 						containerSize={containerSize}
 					/>
 				)}
@@ -246,14 +248,17 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 					{showHistory &&
             <HistoryList
               mindMapId={mindMapId}
-              snapshot={hoverSnapshot}
-              setHoverSnapshot={setHoverSnapshot}
+              snapshot={toggleSnapshot}
+              setHoverSnapshot={setToggleSnapshot}
               updateMindMap={() => {
 								fetchMindMap();
 								fetchNodes();
 								fetchConnections();
 							}}
-              onClose={() => setShowHistory(false)}
+              onClose={() => {
+								setToggleSnapshot(null)
+	              setShowHistory(false)
+              }}
             />
 					}
 					{showNodeForm &&

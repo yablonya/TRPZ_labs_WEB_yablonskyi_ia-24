@@ -57,8 +57,6 @@ const AddNodeForm: FC<AddNodeFormProps> = ({ mindMapId, onClose, onNodeAdded, co
 
 		try {
 			const uploadedFiles = await uploadFiles();
-			
-			console.log(uploadedFiles);
 
 			const nodeIcons = [];
 			
