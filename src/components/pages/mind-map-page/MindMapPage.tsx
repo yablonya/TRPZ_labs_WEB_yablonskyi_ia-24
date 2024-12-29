@@ -283,4 +283,3 @@ const MindMapPage: FC<MindMapPageProps> = ({ mindMapId }) => {
 };
 
 export default MindMapPage;
-

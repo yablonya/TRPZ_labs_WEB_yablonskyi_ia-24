@@ -51,14 +51,6 @@ const PreviewNodesContainer: FC<PreviewNodesContainerProps> = ({
 								stroke="black"
 								strokeWidth={2}
 							/>
-							<text
-								x={midX}
-								y={midY}
-								fill="red"
-								style={{cursor: 'pointer', fontWeight: 'bold'}}
-							>
-								×
-							</text>
 						</g>
 					);
 				})}

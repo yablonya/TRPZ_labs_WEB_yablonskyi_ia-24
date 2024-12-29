@@ -211,6 +211,7 @@ const NodesContainer: FC<NodesContainerProps> = ({
 				<NodeComponent
 					key={node.id}
 					node={node}
+					connections={connections}
 					updateNodeContent={(id, content) => updateNodeContent(id, content)}
 					onDeleteNode={onDeleteNode}
 					connectionOriginNodeId={connectionOriginNodeId}

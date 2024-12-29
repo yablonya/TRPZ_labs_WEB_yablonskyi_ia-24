@@ -1,7 +1,7 @@
 import React, {ChangeEvent, FC, FormEvent, useCallback, useEffect, useRef, useState} from 'react';
 import { NodeType } from "@/types/NodeType";
 import { useDrag } from 'react-dnd';
-import {NewNodeIcon, NodeFile, NodeIcon } from '@/types';
+import {ConnectionType, NewNodeIcon, NodeFile, NodeIcon} from '@/types';
 import {
 	addFileToNode,
 	createNodeIcon,
@@ -18,6 +18,7 @@ import FileComponent from "@/components/common/file-component/FileComponent";
 
 interface NodeComponentProps {
 	node: NodeType;
+	connections: ConnectionType[];
 	updateNodeContent: (id: string, content: string) => void;
 	onDeleteNode: (nodeId: string) => void;
 	connectionOriginNodeId: string | null;
@@ -28,6 +29,7 @@ interface NodeComponentProps {
 
 const NodeComponent: FC<NodeComponentProps> = ({
 	node,
+	connections,
 	updateNodeContent,
 	onDeleteNode,
 	setConnectionOriginNodeId,
@@ -334,7 +336,12 @@ const NodeComponent: FC<NodeComponentProps> = ({
 					Cancel connection
 				</button>
 			)}
-			{connectionOriginNodeId !== null && connectionOriginNodeId !== node.id && (
+			{connectionOriginNodeId !== null 
+				&& connectionOriginNodeId !== node.id 
+				&& (connections.filter((connection) =>
+					(connection.toNode.id === node.id && connection.fromNode.id === connectionOriginNodeId)
+					|| (connection.fromNode.id === node.id && connection.toNode.id === connectionOriginNodeId)
+				).length === 0) && (
 				<button
 					onClick={() => {
 						onCreateConnection(connectionOriginNodeId!, node.id);

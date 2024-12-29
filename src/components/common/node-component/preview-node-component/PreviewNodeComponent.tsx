@@ -22,6 +22,7 @@ const PreviewNodeComponent: FC<PreviewNodeComponentProps> = ({
 				top: `${node.yposition}px`,
 				position: "absolute",
 				cursor: "move",
+				width: "200px"
 			}}
 		>
 			{icons.some((icon) => icon.type === "priority") && (

@@ -146,10 +146,13 @@ export async function restoreSnapshot(mindMapId: string, snapshotId: string): Pr
 }
 
 export async function deleteSnapshot(mindMapId: string, snapshotId: string): Promise<void> {
-	const res = await fetch(`http://localhost:8080/api/mind-map/${mindMapId}/history/delete-snapshot?snapshotId=${snapshotId}`, {
-		method: 'DELETE',
-		credentials: 'include',
-	});
+	const res = await fetch(
+		`http://localhost:8080/api/mind-map/${mindMapId}/history/delete-snapshot?snapshotId=${snapshotId}`,
+		{
+			method: 'DELETE',
+			credentials: 'include',
+		}
+	);
 
 	if (!res.ok) {
 		throw new Error("Error deleting mind map snapshot");

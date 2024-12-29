@@ -1,4 +1,4 @@
-export type NodeType = {
+export interface NodeType {
 	id: string;
 	mindMapId: string;
 	content: string;

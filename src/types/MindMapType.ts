@@ -4,4 +4,3 @@ export type MindMapType = {
 	name: string;
 	creationDate: string;
 }
-
